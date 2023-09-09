@@ -2,7 +2,7 @@
 #include "uart.h"
 #include "mbox.h"
 #include "framebf.h"
-#include "game_background.h"
+#include "function.h"
 
 void displayMenu()
 {
@@ -15,17 +15,6 @@ void displayMenu()
         "\t5.\tPlay game\n"
         "\t0.\tClear the screen\n");
 }
-
-void displayGameBackground(int x, int y){
-  for (int h = 0; h < background_height; h++)
-  {
-    for (int w = 0; w < background_width; w++)
-    {
-      drawPixelARGB32(x + w, y + h, background_image[h * background_width + w]);
-    }
-  }
-}
-
 void main()
 {
     // set up serial console
@@ -54,6 +43,9 @@ void main()
 
         if (command == '5') {
             displayGameBackground(0,0);
+        }
+        if (command == '0') {
+            clearscreen(0,0);
         }
     }
 }
