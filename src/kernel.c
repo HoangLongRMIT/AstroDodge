@@ -3,8 +3,8 @@
 #include "mbox.h"
 #include "framebf.h"
 #include "function.h"
-#include "./image_display/display_image.h"
-#include "./video_display/display_video.h"
+#include "display_image.h"
+#include "display_video.h"
 
 void displayMenu()
 {
@@ -48,12 +48,12 @@ void main()
         if (command == '2')
         {
             clearscreen(0,0);
-            control_scrollable_image(x_coordinate, y_coordinate);
+            control_slideshow_image(x_coordinate, y_coordinate, count);
         }
         else if (command == '3')
         {
             clearscreen(0,0);
-            control_slideshow_image(x_coordinate, y_coordinate, count);
+            control_scrollable_image(x_coordinate, y_coordinate);
         } else if (command == '4')
         {
             clearscreen(0,0);
