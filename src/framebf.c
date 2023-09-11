@@ -2,7 +2,6 @@
 #include "mbox.h"
 #include "uart.h"
 #include "terminal.h"
-#include "object.h"
 
 // Use RGBA32 (32 bits for each pixel)
 #define COLOR_DEPTH 32
