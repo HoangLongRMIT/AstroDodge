@@ -1,6 +1,9 @@
 // ----------------------------------- framebf.c -------------------------------------
 #include "mbox.h"
 #include "uart.h"
+#include "terminal.h"
+#include "object.h"
+
 // Use RGBA32 (32 bits for each pixel)
 #define COLOR_DEPTH 32
 // Pixel Order: BGR in memory order (little endian --> RGB in byte order)
@@ -168,5 +171,27 @@ void drawCircleARGB32(int centerX, int centerY, int radius, unsigned int attr)
             x--;
             radiusError += 2 * (y - x) + 1;
         }
+    }
+}
+
+void drawPixel(int x, int y, unsigned char attr) 
+{
+    int offs = (y * pitch) + (x * 4);
+    *((unsigned int *)(fb + offs)) = vgapal[attr & 0x0f];
+}
+
+// Draw list of frame images in video
+void display_frame_image(unsigned int frame_image[], int x, int y, int width,
+                         int height) {
+    int num = 0;
+
+    while (y < height) {
+        for (x = 0; x < width; x++) {
+            int offs = (y * pitch) + (x * 4);
+            *((unsigned int *)(fb + offs)) = frame_image[num];
+            num++;
+        }
+        y++;
+        x = 0;
     }
 }
