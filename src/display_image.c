@@ -1,6 +1,7 @@
 #include "image1.h"
 #include "image2.h"
 #include "image3.h"
+#include "image4.h"
 #include "framebf.h"
 #include "function.h"
 #include "uart.h"
@@ -29,13 +30,21 @@ void display_image_3(int x, int y)
       drawPixelARGB32(x + w, y + h, image3[h * image3_width + w]);
 }
 
+// Function to display fourth image
+void display_image_4(int x, int y)
+{
+  for (int h = 0; h < image4_height; h++)
+    for (int w = 0; w < image4_width; w++)
+      drawPixelARGB32(x + w, y + h, image4[h * image4_width + w]);
+}
+
 // Display selected images
 void display_certain_image(int count, int x, int y)
 {
   if (count == 1)
     display_image_1(x,y);
   else if (count == 2)
-    display_image_2(x,y);
+    display_image_4(x,y);
   else if (count == 3)
     display_image_3(x,y);
 }
