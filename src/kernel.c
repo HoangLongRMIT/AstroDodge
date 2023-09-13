@@ -179,6 +179,8 @@ void cli()
 		else if(comp_str(cli_buffer, "0") == 0)
             {
                 clearscreen(1920, 1080);
+				uart_puts("\033[2J");  	// clear command screen
+				uart_puts("\033[H");  	// scroll to top screen
             }
 		else {
 			uart_puts("Invalid command");
