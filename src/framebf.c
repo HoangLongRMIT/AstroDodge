@@ -1,7 +1,13 @@
 // ----------------------------------- framebf.c -------------------------------------
+// Reference: https://github.com/isometimes/rpi4-osdev/blob/master/part5-framebuffer/fb.c 
+
+
 #include "mbox.h"
 #include "uart.h"
-#include "terminal.h"
+#include "framebf.h"
+#include "function.h"
+#include "font.h"
+
 
 // Use RGBA32 (32 bits for each pixel)
 #define COLOR_DEPTH 32
@@ -15,6 +21,10 @@ unsigned char *fb;
 /**
  * Set screen resolution to 1024x768
  */
+
+//==================================================================================================//
+//                                      FONT CONVERSION                                             //
+//==================================================================================================//
 void framebf_init()
 {
     mBuf[0] = 35 * 4; // Length of message in bytes
@@ -83,6 +93,9 @@ void framebf_init()
         uart_puts("Unable to get a frame buffer with provided setting\n");
     }
 }
+
+// Function to draw pixel with ARGB32
+//----------------------------------------------------------------------------
 void drawPixelARGB32(int x, int y, unsigned int attr)
 {
     int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
@@ -95,6 +108,9 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     // Access 32-bit together
     *((unsigned int *)(fb + offs)) = attr;
 }
+
+// Function to draw rectangle
+//----------------------------------------------------------------------------
 void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
 {
     for (int y = y1; y <= y2; y++)
@@ -107,12 +123,9 @@ void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
         }
 }
 
-int abs(int x)
-{
-    return (x < 0) ? -x : x;
-}
 
-
+// Function to draw line
+//----------------------------------------------------------------------------
 void drawLineARGB32(int x1, int y1, int x2, int y2, unsigned int attr)
 {
     int dx = abs(x2 - x1);
@@ -142,6 +155,8 @@ void drawLineARGB32(int x1, int y1, int x2, int y2, unsigned int attr)
     }
 }
 
+// Function to draw circle
+//----------------------------------------------------------------------------
 void drawCircleARGB32(int centerX, int centerY, int radius, unsigned int attr)
 {
     int x = radius;
@@ -172,12 +187,139 @@ void drawCircleARGB32(int centerX, int centerY, int radius, unsigned int attr)
         }
     }
 }
-
-void drawPixel(int x, int y, unsigned char attr) 
-{
+//==================================================================================================//
+//                                      FONT CONVERSION                                             //
+//==================================================================================================//
+// Function to draw pixel
+//----------------------------------------------------------------------------
+void drawPixel(int x, int y, unsigned char attr) {
     int offs = (y * pitch) + (x * 4);
-    *((unsigned int *)(fb + offs)) = vgapal[attr & 0x0f];
+    *((unsigned int *)(fb + offs)) = vgapal[attr & 0xff];
+    // *((unsigned int *)(fb + offs)) = vgapal[attr];
 }
+// Function print character with font
+//----------------------------------------------------------------------------
+void drawChar(unsigned char ch, int x, int y, unsigned char attr){
+    // unsigned char *glyph = (unsigned char *)&letterA;
+
+    // get index of character from epd_bitmap_allArray
+    int index = (ch >= 'A' && ch <= 'Z') ? ch - 55 : ch - 48;
+    index = (ch == ' ') ? 37 : index;
+    index = (ch == '-') ? 36 : index;
+
+    // Print glyph of character
+    for (int i = 0; i < FONT_HEIGHT; i++) {
+        for (int j = 0; j < FONT_WIDTH; j++) {
+            // unsigned char mask = 1 << j;
+            unsigned long mask = 0xffff;
+
+            // unsigned char col = (*glyph & mask) ? (attr & 0x0f) : 1;
+            unsigned char *glyph = (unsigned char *)&epd_bitmap_allArray[index][i * FONT_WIDTH + j];
+            
+            // Get the coordinate to assign color
+            unsigned char col = (*glyph & mask) ? (attr & 0xff) : 1;
+            // unsigned char col = (*glyph & mask) ? (attr & 0xff) : 1;
+
+            // Move to next column until reach the end of bitmap epd_bitmap_allArray
+            if (col != 1) {
+                // Fill pixel with current column while neglecting the background pixel
+                if ((unsigned char *)&epd_bitmap_allArray[index][i * FONT_WIDTH + j] != 0x0000){
+                    drawPixel(x + j, y + i, col);
+                }
+            }
+            
+            // // Fill pixel with current column 
+            // if ((unsigned char *)&epd_bitmap_allArray[index][i * FONT_WIDTH + j] != 0x0000){
+            //     drawPixel(x + j, y + i, col);
+            // }
+        }
+    }
+}
+
+// Function print string with font
+//----------------------------------------------------------------------------
+void drawString(int x, int y, char *s, char* color){
+    unsigned char attr;
+
+    // color list
+    static const char text_color_list[][50] = {"black",             // 0. Black
+                                                "blue",             // 1. Blue
+                                                "green",            // 2. GReen
+                                                "cyan",             // 3. Cyan
+                                                "red",              // 4. Red
+                                                "magenta",          // 5. Magenta
+                                                "brown",            // 6. Brown
+                                                "light grey",       // 7. Light Grey
+                                                "dark grey",        // 8. Dark Grey
+                                                "bright blue",      // 9. Bright Blue
+                                                "bright green",     // 10. Bright Green
+                                                "bright cyan",      // 11. Bright Cyan
+                                                "bright red",       // 12. Bright Red
+                                                "bright magenta",   // 13. Bright Magenta
+                                                "yellow",           // 14. Yellow
+                                                "white"             // 15. White
+                                                };
+
+    // Assign input color to text
+    // int text_color_index = 0;
+    for (int i = 0; i < 16; i++){
+        if (comp_str(color, text_color_list[i]) == 0)
+        {
+            // text_color_index = i;
+            // attr = text_color_list[i];
+            attr = i + 2;
+            break;
+        }
+    }
+    
+    // attr = text_color_list[text_color_index];
+    
+    while (*s) {
+        if (*s == '\r') 
+        {
+            x = 0;
+        } 
+        else if (*s == '\n') 
+        {
+            x = 0;
+            y += FONT_HEIGHT;
+        } 
+        else if (*s == ' ')
+        {
+            drawChar(*s, x, y, attr);
+            x += FONT_WIDTH - 20;
+        } 
+        else 
+        {
+            drawChar(*s, x, y, attr);
+            x += FONT_WIDTH;
+        }
+        s++;
+    }
+}
+
+
+// Function print content with font
+//----------------------------------------------------------------------------
+void font()
+{
+    drawString(5, 20, "EEET2490 ASM3", "yellow");
+        drawString(5, 80, "--------------", "white");
+
+    drawString(5, 180, "LE ANH QUAN", "blue");
+        drawString(20, 240, "S3877457", "cyan");
+
+    drawString(5, 340, "TRAN VINH TRONG", "bright red");
+        drawString(20, 400, "S3863973", "magenta");
+
+    drawString(5, 500, "PHAM TRINH HOANG LONG", "brown");
+        drawString(20, 560, "S3879366", "light grey");
+
+    drawString(5, 660, "HOANG THAI KIET", "bright green");
+        drawString(20, 720, "S3855250", "bright cyan");
+}
+
+
 
 // Draw list of frame images in video
 void display_frame_image(unsigned int frame_image[], int x, int y, int width,
