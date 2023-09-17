@@ -80,9 +80,10 @@ void init_enemies(World *world)
         world->enemies[i].needs_update = 1;
         world->enemies[i].enabled = 1;
         world->enemies[i].combat_update = 0;
-        for (int j = 0; j < MAX_BULLETS; j++)
+        for (int j = 0; j < MAX_BULLETS; j++){
             world->enemies[i].projectile[j].active = 0;
             world->enemies[i].projectile[j].position.y=1000;
+        }
             
             
     }
