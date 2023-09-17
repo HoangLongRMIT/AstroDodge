@@ -1013,16 +1013,16 @@ void drawGameMenu(World *game)
 void drawMainMenu(Game *game)
 {
     int *colorptrMenu;
-    int widthMenu = main_menu_quit.width;
-    int heightMenu = main_menu_quit.height;
+    int widthMenu = start_image.width;
+    int heightMenu = start_image.height;
 
     if ((game->main_menu.game_start_menu))
-        colorptrMenu = (int *)main_menu_quit.image_pixels;
+        colorptrMenu = (int *)start_image.image_pixels;
     else
-        colorptrMenu = (int *)main_menu_start.image_pixels;
+        colorptrMenu = (int *)quit_image.image_pixels;
 
     int xMenu = (int)((MAP_WIDTH / 2) - (widthMenu / 2));
-    int yMenu = TOP_MAX + LOGO.height;
+    int yMenu = TOP_MAX + 455;
 
     for (int i = 0; i < (widthMenu * heightMenu); i++)
     {
@@ -1032,10 +1032,14 @@ void drawMainMenu(Game *game)
             yMenu++;
             xMenu = (int)((MAP_WIDTH / 2) - (widthMenu / 2));
         }
-        drawPixel(xMenu, yMenu, colorptrMenu[i]);
+        if (colorptrMenu[i] != 0xFF000000)
+        {
+            drawPixelARGB32(xMenu, yMenu, colorptrMenu[i]);
+        }
+        else {
+            drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
+        }
     }
-    // drawAuthors();
-    displayAuthorsImage(80, 650);
 }
 
 void endScreen(int won, World *world)
