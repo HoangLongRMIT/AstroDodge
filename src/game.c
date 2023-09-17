@@ -229,7 +229,7 @@ void show_game_menu(World *world)
             if (world->game_menu.game_menu_option == 2)
             {
                 world->game_menu.on_gameMenu_menu = 0;
-                clear_emulator_screen(1024, 768);
+                displayGameUniverseBackground(0,0);
                 printf("\nSELECT: Pause");
                 world->life.needs_render = 1;
                 world->playerScore.needsRender = 1;
@@ -238,14 +238,14 @@ void show_game_menu(World *world)
             }
             else if (world->game_menu.game_menu_option == 1)
             {
-                clear_emulator_screen(1920, 1080);
+                displayGameUniverseBackground(0,0);
                 printf("\nSELECT: Restart");
                 restartGame = 1;
                 return;
             }
             else if (world->game_menu.game_menu_option == 0)
             {
-                clear_emulator_screen(1920, 1080);
+                displayGameUniverseBackground(0,0);
                 printf("\nSELECT: Quit");
                 quitGame = 1;
                 return;
@@ -962,7 +962,15 @@ void drawGameMenu(World *game)
             yMenu++;
             xMenu = (int)((MAP_WIDTH / 2) - (widthMenu / 2));
         }
-        drawPixel(xMenu, yMenu, colorptrMenu[i]);
+        if (colorptrMenu[i] != 0x00000000)
+        {
+            // uart_hex(colorptrMenu[i]);
+            drawPixelARGB32(xMenu, yMenu, colorptrMenu[i]);
+        }
+        else {
+            drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
+        }
+        // drawPixel(xMenu, yMenu, colorptrMenu[i]);
     }
 }
 void drawMainMenu(Game *game)
