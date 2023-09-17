@@ -20,9 +20,8 @@ kernel8.img: $(BUILD_DIR)/boot.o $(OFILES)
 	aarch64-none-elf-objcopy -O binary $(BUILD_DIR)/kernel8.elf kernel8.img
 
 clean:
-# 	del *.img .\obj\kernel8.elf .\obj\*.o
-	rm -f ./obj/kernel8.elf ./obj/*.o ./kernel8.img
+	del *.img .\obj\kernel8.elf .\obj\*.o
 
 #raspi3b for mac and raspi3 for window
 run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio
+	qemu-system-aarch64 -M raspi3 -kernel kernel8.img -serial null -serial stdio

@@ -3,19 +3,9 @@
 #include "mbox.h"
 #include "uart.h"
 
-#define NUM_PAWNS 20
-#define PAWN_POINTS 10
-#define PAWN_HEALTH 1
 
-#define NUM_KNIGHTS 10
-#define KNIGHT_POINTS 30
-#define KNIGHT_HEALTH 2
 
-#define NUM_QUEENS 10
-#define QUEEN_POINTS 50
-#define QUEEN_HEALTH 3
-
-#define NUM_ENEMIES (NUM_PAWNS + NUM_QUEENS + NUM_KNIGHTS)
+#define NUM_ENEMIES (12)
 
 #define NUM_BUNKERS 3
 #define BUNKER_HEALTH 10
@@ -79,7 +69,7 @@ typedef struct {
     int needsRender;
 } Score;
 
-typedef enum { PLAYER = 1, PAWN = 2, QUEEN = 3, BUNKER = 4,KNIGHT = 5} Type;
+typedef enum { PLAYER = 1, ENEMIES=2} Type;
 
 typedef struct {
     Position position;
@@ -91,7 +81,7 @@ typedef struct {
     int needs_clear;
     int active;
 } Missile;
-/* ship, alien, bunker */
+/* ship, shooter */
 typedef struct {
     Velocity velocity;
     Dimension dimension;
@@ -118,7 +108,6 @@ typedef struct {
 
 typedef struct map {
     Entity player;
-    Entity bunkers[NUM_BUNKERS];
     Entity enemies[NUM_ENEMIES];
     int shooters[MAX_SHOOTERS];
     int left_most_enemies[6];
@@ -148,7 +137,7 @@ typedef enum {
     RESET_VERTICAL,
     RESET_HORIZONTAL
 } Direction;
-
+static Dimension meteors= {100,100};
 void init_game(Game *world);
 void init_map(World *world);
 
@@ -176,7 +165,7 @@ void render_score(int num,int x, int y);
 void update_combat_system(World *world);
 void update_collision_system(World *world);
 void clear(Entity entity);
-void update_score(World *world, Type type);
+void update_score(World *world);
 void enemy_shoot(World *world);
 int rand(void);
 
@@ -188,7 +177,6 @@ void drawMainMenu(Game *game);
 void show_game_menu(World *world);
 void show_main_menu(Game *game) ;
 void drawScore(World *world,char *type);
-void init_bunkers(Entity bunkers[]);
 void init_playerScore(Score *playerScore);
 void endScreen(int won, World *world) ;
 void restart_game(Game *world);

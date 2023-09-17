@@ -32,7 +32,6 @@ void init_map(World *world)
 {
     init_player(&world->player);
     init_enemies(world);
-    // init_bunkers(world->bunkers);
     init_playerScore(&world->playerScore);
     init_life(&world->life);
     world->enemies_alive = NUM_ENEMIES;
@@ -49,7 +48,7 @@ void restart_game(Game *world)
     world->main_menu.game_start_menu = 1;
     world->game_win = 0;
     restartGame = 0;
-    displayGameUniverseBackground(0,0);
+    displayGameUniverseBackground(0, 0);
     // clear_emulator_screen(1920, 1080);
     pauseGame = 0;
     quitGame = 0;
@@ -72,7 +71,7 @@ void init_player(Entity *player)
     player->enabled = 1;
 }
 
-// Setting the value for aliens
+// Setting the value for enemies
 void init_enemies(World *world)
 {
     for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
@@ -95,25 +94,6 @@ void init_enemies(World *world)
     }
 }
 
-// Setting the value for bunker
-void init_bunkers(Entity bunkers[])
-{
-    for (int i = 0; i < NUM_BUNKERS; i++)
-    {
-        bunkers[i].position.x = 20 + (150 * (i + 1)) + (120 * i);
-        bunkers[i].position.y = (MAP_HEIGHT)-150;
-        bunkers[i].previous_pos = bunkers[i].position;
-        bunkers[i].health.current_health = BUNKER_HEALTH;
-        bunkers[i].dimension.height = bunker_1.height;
-        bunkers[i].dimension.width = bunker_1.width;
-        bunkers[i].health.current_health = BUNKER_HEALTH;
-        bunkers[i].type = BUNKER;
-        bunkers[i].enabled = 1;
-        bunkers[i].needs_update = 1;
-        bunkers[i].needs_render = 1;
-        bunkers[i].combat_update = 0;
-    }
-}
 // Move player
 void move_player(World *world)
 {
@@ -212,7 +192,7 @@ void show_main_menu(Game *game)
                 game->game_start = 1;
             else
                 game->game_start = 0;
-            displayGameUniverseBackground(0,0);
+            displayGameUniverseBackground(0, 0);
         }
     }
 }
@@ -436,10 +416,11 @@ int rand(void)
     return (unsigned int)(next / 65536) % 32768;
 }
 // Function to generate a random number between 100 and 900
-int randAsteroidPosition() {    
+int randAsteroidPosition()
+{
     // Generate a random number between 0 and 800 (inclusive)
     int randomNumber = rand() % 801;
-    
+
     // Add 100 to the generated number to get a range from 100 to 900
     return randomNumber + 100;
 }
@@ -452,8 +433,9 @@ void entity_shoot(Entity *entity, Direction direction)
     {
         if (!entity->projectile[i].active)
         {
-            // Initial a bullet
-            if (entity->type == PLAYER) {
+            // Initial a bullet from player
+            if (entity->type == PLAYER)
+            {
                 entity->projectile[i].position.x =
                     entity->position.x + (entity->dimension.width / 2);
                 entity->projectile[i].position.y =
@@ -461,7 +443,8 @@ void entity_shoot(Entity *entity, Direction direction)
                 entity->projectile[i].dimension.height = red_laser.height;
                 entity->projectile[i].dimension.width = red_laser.width;
             }
-            else {
+            else
+            {
                 entity->projectile[i].position.x =
                     randAsteroidPosition();
                 entity->projectile[i].position.y =
@@ -469,8 +452,6 @@ void entity_shoot(Entity *entity, Direction direction)
                 entity->projectile[i].dimension.height = asteroid_image.height;
                 entity->projectile[i].dimension.width = asteroid_image.width;
             }
-            // printf("\nprojectve x: %f", entity->projectile[i].position.x);
-            // printf("\nprojectve y: %f\n", entity->projectile[i].position.y);
             entity->projectile[i].needs_update = 1;
             entity->projectile[i].needs_render = 1;
             entity->projectile[i].active = 1;
@@ -575,6 +556,18 @@ int intersectAABB(Missile *projectile, Entity *entity)
                entity->position.y;
 }
 
+int intersection(Missile *projectile, Missile *entity)
+{
+    return projectile->position.x <
+               (entity->position.x + entity->dimension.width) &&
+           (projectile->position.x + projectile->dimension.width) >
+               entity->position.x &&
+           projectile->position.y <
+               (entity->position.y + entity->dimension.height) &&
+           (projectile->position.y + projectile->dimension.height) >
+               entity->position.y;
+}
+
 void resolve_collisions(Missile *projectile, Entity *entity)
 {
     int isEnabled = entity->enabled;
@@ -589,22 +582,32 @@ void resolve_collisions(Missile *projectile, Entity *entity)
     }
 }
 
+void resolve_collisions2(Missile *projectile, Missile *projectile2, World *world)
+{
+    int intersects = intersection(projectile, projectile2);
+    if (intersects)
+    {
+        drawExplosion2(projectile2);
+        wait_msec(1000);
+        projectile->active = 0;
+        projectile->needs_update = 0;
+        projectile->needs_render = 0;
+        projectile->needs_clear = 1;
+        projectile2->active = 0;
+        projectile2->needs_update = 0;
+        projectile2->needs_render = 0;
+        projectile2->needs_clear = 1;
+        update_score(world);
+        world->playerScore.needsRender = 1;
+        uart_puts("hit \n");
+    }
+}
+
 void update_collision_system(World *world)
 {
     Entity *player = &world->player;
     Entity *enemy = world->enemies;
-    Entity *bunker = world->bunkers;
 
-    for (int i = 0; i < MAX_BULLETS; i++)
-    {
-        if (player->projectile[i].active)
-        {
-            for (int j = 0; j < NUM_ENEMIES; j++)
-                resolve_collisions(&player->projectile[i], &enemy[j]);
-            for (int k = 0; k < NUM_BUNKERS; k++)
-                resolve_collisions(&player->projectile[i], &bunker[k]);
-        }
-    }
     for (int i = 0; i < 10; i++)
     {
         int index = world->shooters[i];
@@ -613,8 +616,13 @@ void update_collision_system(World *world)
             if (enemy[index].projectile[j].active)
             {
                 resolve_collisions(&enemy[index].projectile[j], player);
-                for (int k = 0; k < NUM_BUNKERS; k++)
-                    resolve_collisions(&enemy[index].projectile[j], &bunker[k]);
+                for (int a = 0; a < MAX_BULLETS; a++)
+                {
+                    if (player->projectile[a].active)
+                    {
+                        resolve_collisions2(&player->projectile[a], &enemy[index].projectile[j], world);
+                    }
+                }
             }
         }
     }
@@ -631,46 +639,10 @@ void update_shooters(World *world, int index)
 }
 void update_combat_system(World *world)
 {
-    for (int i = 0; i < NUM_ENEMIES; i++)
+
+    if (world->playerScore.score > 250)
     {
-        if (world->enemies[i].combat_update)
-        {
-            world->enemies[i].health.current_health -= 1;
-            if (world->enemies[i].health.current_health <= 0)
-            {
-                world->enemies[i].enabled = 0;
-                world->enemies[i].needs_clear = 1;
-                drawExplosion(world->enemies[i]);
-                wait_msec(500);
-                world->playerScore.needsRender = 1;
-                update_score(world, world->enemies[i].type);
-                update_shooters(world, i);
-                world->enemies_alive -= 1;
-            }
-            world->enemies[i].combat_update = 0;
-            if (world->enemies_alive == 0)
-            {
-                endScreen(1, world);
-            }
-        }
-    }
-
-    for (int i = 0; i < NUM_BUNKERS; i++)
-    {
-        if (world->bunkers[i].combat_update)
-        {
-            world->bunkers[i].health.current_health -= 1;
-
-            if (world->bunkers[i].health.current_health <= 0)
-            {
-                world->bunkers[i].enabled = 0;
-                world->bunkers[i].position.x = 0;
-                world->bunkers[i].position.y = 0;
-
-                world->bunkers[i].needs_clear = 1;
-            }
-            world->bunkers[i].combat_update = 0;
-        }
+        endScreen(1, world);
     }
 
     if (world->player.combat_update)
@@ -729,13 +701,11 @@ void render(World *world)
         else if (world->player.projectile[i].needs_clear)
         {
             clear_projectile(world->player.projectile[i].position,
-                             world->player.projectile[i].dimension);
+                             meteors);
             world->player.projectile[i].needs_clear = 0;
         }
     }
-    // for (int i = 0; i < NUM_ENEMIES; i++) {
-    //     drawEntity(world->enemies[i]);
-    // }
+
     for (int i = 0; i < NUM_ENEMIES; i++)
     {
         if (world->enemies[i].needs_render && world->enemies[i].enabled)
@@ -762,21 +732,7 @@ void render(World *world)
             world->enemies[i].needs_clear = 0;
         }
     }
-    // for (int i = 0; i < NUM_BUNKERS; i++)
-    // {
-    //     if (world->bunkers[i].enabled)
-    //     {
-    //         clear(world->bunkers[i]);
-    //         drawEntity(world->bunkers[i]);
-    //     }
-    //     else if (world->bunkers[i].needs_clear)
-    //     {
-    //         clear(world->bunkers[i]);
 
-    //         drawSpaceShip(world->player, world);
-    //         world->bunkers[i].needs_clear = 0;
-    //     }
-    // }
     for (int i = 0; i < MAX_SHOOTERS; i++)
     {
         for (int j = 0; j < MAX_BULLETS; j++)
@@ -785,6 +741,7 @@ void render(World *world)
             Type type = world->enemies[index].type;
             if (world->enemies[index].projectile[j].needs_render)
             {
+
                 clear_projectile(
                     world->enemies[index].projectile[j].previous_pos,
                     world->enemies[index].projectile[j].dimension);
@@ -809,6 +766,8 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
+        drawExplosion(world->player);
+        wait_msec(500);
         clear(world->player);
         world->player.needs_clear = 0;
     }
@@ -966,14 +925,10 @@ void init_playerScore(Score *playerScore)
     playerScore->needsRender = 1;
 }
 
-void update_score(World *world, Type type)
+void update_score(World *world)
 {
-    if (type == PAWN)
-        world->playerScore.score += PAWN_POINTS;
-    if (type == KNIGHT)
-        world->playerScore.score += KNIGHT_POINTS;
-    if (type == QUEEN)
-        world->playerScore.score += QUEEN_POINTS;
+
+    world->playerScore.score += 30;
 }
 
 void *memcpy(void *dest, const void *src, unsigned long n)
@@ -1050,7 +1005,7 @@ void endScreen(int won, World *world)
     uart_puts("Press o to out: \n");
     uart_puts("Press r to restart: \n");
     char *type = "d";
-    displayGameUniverseBackground(0,0);
+    displayGameUniverseBackground(0, 0);
 
     clear_emulator_screen(1024, 768);
 
@@ -1099,13 +1054,17 @@ void drawExplosion(Entity entity)
     int y = entity.position.y;
     if (entity.type == PLAYER)
     {
-        uart_puts("Choó Sir");
-        displayExplosion2(x, y);
-    }
-    else
-    {
+        uart_puts("Dead \n");
         displayExplosion(x, y);
     }
+}
+void drawExplosion2(Missile entity)
+{
+    int x = entity.position.x;
+    int oldX = x;
+    int y = entity.position.y;
+
+    displayExplosion2(x, y);
 }
 
 void drawSpaceShip(Entity entity, World *world)
@@ -1120,25 +1079,8 @@ void drawSpaceShip(Entity entity, World *world)
     printf("Score: %d\n", score);
     if (entity.type == PLAYER)
     {
-        if (score <= 100)
-        {
-            displaySpaceShipImage(x, y);
-        }
-        else if (score > 100 && score <= 250)
-        {
-            clear(world->player);
-            displaySpaceShipImageLevel2(x, y);
-        }
-        else if (score > 250 && score <= 700)
-        {
-            clear(world->player);
-            displaySpaceShipImageLevel3(x, y);
-        }
-        else
-        {
-            clear(world->player);
-            displaySpaceShipImageLevel4(x, y);
-        }
+
+        displaySpaceShipImage(x, y);
     }
 }
 
@@ -1162,23 +1104,3 @@ void clear(Entity entity)
         drawPixelARGB32(x, y, background_universe_image_1[y * universe_background_width_1 + x]);
     }
 }
-
-// // Function to display space ship image without drawing green pixels
-// void displaySpaceShipImage(int x, int y)
-// {
-//   for (int h = 0; h < spaceship_height; h++)
-//   {
-//     for (int w = 0; w < spaceship_width; w++)
-//     {
-//       // Get the pixel color
-//       uint32_t pixelColor = spaceship_image[h * spaceship_width + w];
-      
-//       // Check if it's not green (assuming green is 0x00FF00FF in ARGB32)
-//       if (pixelColor != 0x00000000)
-//       {
-//         // Draw the pixel if it's not green
-//         drawPixelARGB32(x + w, y + h, pixelColor);
-//       }
-//     }
-//   }
-// }

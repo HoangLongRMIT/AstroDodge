@@ -113,6 +113,20 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     // Access 32-bit together
     *((unsigned int *)(fb + offs)) = attr;
 }
+void drawPixelARGB32noBackground(int x, int y, unsigned int attr)
+{
+    int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
+    /* //Access and assign each byte
+     *(fb + offs ) = (attr >> 0 ) & 0xFF; //BLUE
+     *(fb + offs + 1) = (attr >> 8 ) & 0xFF; //GREEN
+     *(fb + offs + 2) = (attr >> 16) & 0xFF; //RED
+     *(fb + offs + 3) = (attr >> 24) & 0xFF; //ALPHA
+     */
+    // Access 32-bit together
+    if (attr !=  0x00000000){
+        *((unsigned int *)(fb + offs)) = attr;
+    }
+}
 
 // Function to draw rectangle
 //----------------------------------------------------------------------------
@@ -402,30 +416,9 @@ void drawEntity(Entity entity) {
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
-    if (entity.type == PAWN) {
-        colorptr = (int *)pawn_sprite.image_pixels;
-    } else if (entity.type == KNIGHT)
-        colorptr = (int *)knight_sprite.image_pixels;
-    else if (entity.type == QUEEN)
-        colorptr = (int *)queen_sprite.image_pixels;
-    else if (entity.type == PLAYER)
-        colorptr = (int *)blue_ship_sprite.image_pixels;
-    else if (entity.type == BUNKER) {
-        if (entity.health.current_health <= BUNKER_HEALTH / 3) {
-            colorptr = (int *)bunker_3.image_pixels;
-            width = bunker_3.width;
-            height = bunker_3.height;
-        } else if (entity.health.current_health <= BUNKER_HEALTH / 2) {
-            colorptr = (int *)bunker_2.image_pixels;
-            width = bunker_2.width;
-            height = bunker_2.height;
-        } else {
-            colorptr = (int *)bunker_1.image_pixels;
-            width = bunker_1.width;
-            height = bunker_1.height;
-        }
-    }
 
+   if (entity.type == PLAYER)
+        colorptr = (int *)blue_ship_sprite.image_pixels;
     // draw in 2D
     for (int i = 0; i < (width * height); i++) {
         x++;
