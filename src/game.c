@@ -928,7 +928,7 @@ void init_playerScore(Score *playerScore)
 void update_score(World *world)
 {
 
-    world->playerScore.score += 10;
+    world->playerScore.score += 30;
 }
 
 void *memcpy(void *dest, const void *src, unsigned long n)
