@@ -40,7 +40,7 @@ void init_map(World *world)
     world->game_over = 0;
 }
 void restart_game(Game *world)
-{
+{   clearscreen(0, 0);
     init_map(&world->world);
     world->game_over = 0;
     world->game_start = 0;
@@ -82,12 +82,11 @@ void init_enemies(World *world)
         world->enemies[i].combat_update = 0;
         for (int j = 0; j < MAX_BULLETS; j++)
             world->enemies[i].projectile[j].active = 0;
+            world->enemies[i].projectile[j].position.y=1000;
+            
+            
     }
 
-    // for (int i = 0; i < 6; i++) {
-    //     world->left_most_enemies[i] = 10 * i;
-    //     world->right_most_enemies[i] = 10 * i + 9;
-    // }
     for (int i = 0; i < MAX_SHOOTERS; i++)
     {
         world->shooters[i] = i;
