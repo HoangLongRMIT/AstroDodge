@@ -25,6 +25,8 @@ void displayMenu();
 //====================================================================================//
 // Function to display the screen background image
 void displayGameBackground(int x, int y);
+// Function to display the screen background universe image
+void displayGameUniverseBackground(int x, int y);
 // Function to clear emulator screen
 void clearscreen(int x, int y);
 
