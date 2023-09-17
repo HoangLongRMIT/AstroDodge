@@ -11,7 +11,6 @@
 #include "life.h"
 #include "spaceship.h"
 #include "authors.h"
-#include "spaceships.h"
 #include "mbox.h"
 
 // Function to display first image
@@ -288,7 +287,7 @@ void displayExplosion(int x, int y)
   {
     for (int w = 0; w < explosion_width; w++)
     {
-      drawPixelARGB32(x + w, y + h, explosion_image[h * explosion_width + w]);
+      drawPixelARGB32noBackground(x + w, y + h, explosion_image[h * explosion_width + w]);
     }
   }
 }
@@ -299,7 +298,8 @@ void displayExplosion2(int x, int y)
   {
     for (int w = 0; w < explosion2_width; w++)
     {
-      drawPixelARGB32(x + w, y + h, explosion2_image[h * explosion2_width + w]);
+      if (explosion2_image[h * explosion2_width + w]!=0x00000000)
+      drawPixelARGB32noBackground(x + w, y + h, explosion2_image[h * explosion2_width + w]);
     }
   }
 }
@@ -393,47 +393,12 @@ void displaySpaceShipImage(int x, int y)
       // Get the pixel color
       uint32_t pixelColor = spaceship_image[h * spaceship_width + w];
       
-      // Check if it's not green (assuming green is 0x00FF00FF in ARGB32)
+      // Check if it's not black (assuming green is 0x00FF00FF in ARGB32)
       if (pixelColor != 0x00000000)
       {
-        // Draw the pixel if it's not green
+        // Draw the pixel if it's not black
         drawPixelARGB32(x + w, y + h, pixelColor);
       }
-    }
-  }
-}
-
-// Function to display space ship level 2 image
-void displaySpaceShipImageLevel2(int x, int y)
-{
-  for (int h = 0; h < space_ship_height2; h++)
-  {
-    for (int w = 0; w < space_ship_width2; w++)
-    {
-      drawPixelARGB32(x + w, y + h, space_ship2[h * space_ship_width2 + w]);
-    }
-  }
-}
-
-// Function to display space ship level 3 image
-void displaySpaceShipImageLevel3(int x, int y)
-{
-  for (int h = 0; h < space_ship_height3; h++)
-  {
-    for (int w = 0; w < space_ship_width3; w++)
-    {
-      drawPixelARGB32(x + w, y + h, space_ship3[h * space_ship_width3 + w]);
-    }
-  }
-}
-// Function to display space ship level 4 image
-void displaySpaceShipImageLevel4(int x, int y)
-{
-  for (int h = 0; h < space_ship_height4; h++)
-  {
-    for (int w = 0; w < space_ship_width4; w++)
-    {
-      drawPixelARGB32(x + w, y + h, space_ship4[h * space_ship_width4 + w]);
     }
   }
 }
