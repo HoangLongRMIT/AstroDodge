@@ -7,6 +7,11 @@
 #include "framebf.h"
 #include "function.h"
 #include "font.h"
+#include "display_image.h"
+#include "game.h"
+#include "object.h"
+#include "game_universe_background_2.h"
+// #include "terminal.h"
 
 
 // Use RGBA32 (32 bits for each pixel)
@@ -334,5 +339,100 @@ void display_frame_image(unsigned int frame_image[], int x, int y, int width,
         }
         y++;
         x = 0;
+    }
+}
+
+void clear_projectile(Position position, Dimension dimension) {
+    int width = dimension.width;
+    int height = dimension.height;
+
+    int x = position.x;
+    int oldX = x;
+    int y = position.y;
+
+    for (int i = 0; i < (width * height); i++) {
+        x++;
+        if (i % width == 0) {
+            y++;
+            x = oldX;
+        }
+        drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+    }
+}
+
+void draw_projectile(Type type, Position position, Dimension dimension) {
+    int *colorptr;
+    int width = dimension.width;
+    int height = dimension.height;
+
+    if (type != PLAYER)
+        colorptr = (int *)asteroid_image.image_pixels;
+    else
+        colorptr = (int *)red_laser.image_pixels;
+
+    int x = position.x;
+    int oldX = x;
+    int y = position.y;
+    for (int i = 0; i < (width * height); i++) {
+        x++;
+        if (i % width == 0) {
+            y++;
+            x = oldX;
+        }
+        // Get the pixel color
+        uint32_t pixelColor = colorptr[i];
+        
+        if (colorptr[i] != 0xFF000000)
+        {
+            drawPixelARGB32(x, y, pixelColor);
+        }
+        else {
+            drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+        }
+        
+    }
+}
+
+// Draw an object like ship , alien with pixel data in object.h
+void drawEntity(Entity entity) {
+    int *colorptr;
+    int width = entity.dimension.width;
+    int height = entity.dimension.height;
+
+    int x = entity.position.x;
+    int oldX = x;
+    int y = entity.position.y;
+    if (entity.type == PAWN) {
+        colorptr = (int *)pawn_sprite.image_pixels;
+    } else if (entity.type == KNIGHT)
+        colorptr = (int *)knight_sprite.image_pixels;
+    else if (entity.type == QUEEN)
+        colorptr = (int *)queen_sprite.image_pixels;
+    else if (entity.type == PLAYER)
+        colorptr = (int *)blue_ship_sprite.image_pixels;
+    else if (entity.type == BUNKER) {
+        if (entity.health.current_health <= BUNKER_HEALTH / 3) {
+            colorptr = (int *)bunker_3.image_pixels;
+            width = bunker_3.width;
+            height = bunker_3.height;
+        } else if (entity.health.current_health <= BUNKER_HEALTH / 2) {
+            colorptr = (int *)bunker_2.image_pixels;
+            width = bunker_2.width;
+            height = bunker_2.height;
+        } else {
+            colorptr = (int *)bunker_1.image_pixels;
+            width = bunker_1.width;
+            height = bunker_1.height;
+        }
+    }
+
+    // draw in 2D
+    for (int i = 0; i < (width * height); i++) {
+        x++;
+        if (i % width == 0) {
+            y++;
+            x = oldX;
+        }
+        drawPixelARGB32(x, y, colorptr[i]);
     }
 }

@@ -4,6 +4,7 @@
 #include "mbox.h"
 #include "framebf.h"
 #include "game_background.h"
+#include "game_universe_background.h"
 
 
 //====================================================================================//
@@ -67,6 +68,17 @@ void displayGameBackground(int x, int y){
     for (int w = 0; w < background_width; w++)
     {
       drawPixelARGB32(x + w, y + h, background_image[h * background_width + w]);
+    }
+  }
+}
+// Function to display the screen background universe image
+//--------------------------------------------------------------------------------
+void displayGameUniverseBackground(int x, int y){
+  for (int h = 0; h < universe_background_height; h++)
+  {
+    for (int w = 0; w < universe_background_width; w++)
+    {
+      drawPixelARGB32(x + w, y + h, background_universe_image[h * universe_background_width + w]);
     }
   }
 }

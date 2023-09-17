@@ -145,3 +145,42 @@ char uart_get_char()
     /* convert carriage return to newline */
     return (c == '\r' ? '\n' : c);
 }
+
+/**
+ * Receive a character
+ */
+char uart_getc_game() {
+    char c;
+	 /* wait until data is ready (one symbol) */
+	 int i = 0;
+	 int total_time = 1000000;
+	 do {
+		 asm volatile("nop");
+		 i++;
+		 if(i == total_time){
+			 return '\0';
+		 }
+	 } while ( !(AUX_MU_LSR & 0x01) ); // - bit 1 FIFO hold at least 1 symbol
+	 /* read it and return */
+	 c = (char)(AUX_MU_IO); // - read from FIFO as char
+	 /* convert carriage return to newline */
+	 return (c == '\r' ? '\n' : c); // - check for carriage return if yes change it to Enter
+
+}
+
+/* Function to wait for some msec: the program will stop there */
+void wait_msec(unsigned int n)
+{
+    register unsigned long f, t, r, expiredTime;
+    // Get the current counter frequency (Hz)
+    asm volatile ("mrs %0, cntfrq_el0" : "=r"(f));
+    
+    // Read the current counter value
+    asm volatile ("mrs %0, cntpct_el0" : "=r"(t));
+    
+    // Calculate expire value for counter
+    expiredTime = t + ( (f/1000)*n )/1000;
+    do {
+     asm volatile ("mrs %0, cntpct_el0" : "=r"(r));
+    } while(r < expiredTime);
+}
