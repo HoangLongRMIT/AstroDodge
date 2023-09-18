@@ -157,14 +157,14 @@ void cli()
 		if (comp_str(cli_buffer, "1") == 0)
             {
                 clearscreen(0, 0);
-                displayGameUniverseBackground(0, 0);
+                // displayGameUniverseBackground(0, 0);
                 font();
             }
 		// Checking DISPLAY SMALL IMAGE COMMAND
 		else if(comp_str(cli_buffer,"2") == 0)
             {
 				clearscreen(0,0);
-            control_slideshow_image(x_coordinate, y_coordinate, count);
+            	control_slideshow_image(x_coordinate, y_coordinate, count);
                 // insert
             }
 		// Checking A SCROLLABLE LARGE IMAGE COMMAND

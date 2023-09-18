@@ -325,7 +325,7 @@ void font()
     drawString(5, 20, "EEET2490 ASM3", "yellow");
         drawString(5, 80, "--------------", "white");
 
-    drawString(5, 180, "LE ANH QUAN", "blue");
+    drawString(5, 180, "LE ANH QUAN", "bright blue");
         drawString(20, 240, "S3877457", "cyan");
 
     drawString(5, 340, "TRAN VINH TRONG", "bright red");
@@ -339,8 +339,11 @@ void font()
 }
 
 
-
+//==================================================================================================//
+//                                  FRAME AND GAME MECHANICS                                        //
+//==================================================================================================//
 // Draw list of frame images in video
+//----------------------------------------------------------------------------
 void display_frame_image(unsigned int frame_image[], int x, int y, int width,
                          int height) {
     int num = 0;
@@ -356,6 +359,8 @@ void display_frame_image(unsigned int frame_image[], int x, int y, int width,
     }
 }
 
+// Function to clear projectile
+//----------------------------------------------------------------------------
 void clear_projectile(Position position, Dimension dimension) {
     int width = dimension.width;
     int height = dimension.height;
@@ -373,7 +378,8 @@ void clear_projectile(Position position, Dimension dimension) {
         drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
     }
 }
-
+// Function to draw projectile
+//----------------------------------------------------------------------------
 void draw_projectile(Type type, Position position, Dimension dimension) {
     int *colorptr;
     int width = dimension.width;
@@ -408,6 +414,7 @@ void draw_projectile(Type type, Position position, Dimension dimension) {
 }
 
 // Draw an object like ship , alien with pixel data in object.h
+//----------------------------------------------------------------------------
 void drawEntity(Entity entity) {
     int *colorptr;
     int width = entity.dimension.width;

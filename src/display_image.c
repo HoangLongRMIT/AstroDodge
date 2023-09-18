@@ -350,6 +350,7 @@ void displayWordPlayerLife(int x, int y)
   }
 }
 
+// Function to display player live symbol (3 in total)
 void displayPlayerLife(int x, int y)
 {
   for (int h = 0; h < life_height; h++)

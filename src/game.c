@@ -806,12 +806,15 @@ void drawScore(World *world, char *type)
     if (type == "d")
     {
         x = 350;
-        y = 500;
-        displayScore(770 - x, 10 + y);
+        y = 590;
+        
+        // Print the score at end game
+        displayScore(700 - x, 3 + y);
     }
     if (type == "")
     {
-        displayScore(770, 10);
+        // Print the word score
+        displayScore(700, 3);
     }
 
     int ones = (world->playerScore.score % 10);
@@ -863,7 +866,7 @@ void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
     printf("health: %d\n", clife);
-    displayWordPlayerLife(100, 10);
+    displayWordPlayerLife(13, 10);
 
     if (clife == 0)
     {
@@ -911,27 +914,6 @@ void clear_health(int x, int y)
 //----------------------------------------------------------------------------
 void render_score(int num, int x, int y)
 {
-    // if (num == 1)
-    //     displayScore1(x, y);
-    // else if (num == 2)
-    //     displayScore2(x, y);
-    // else if (num == 3)
-    //     displayScore3(x, y);
-    // else if (num == 4)
-    //     displayScore4(x, y);
-    // else if (num == 5)
-    //     displayScore5(x, y);
-    // else if (num == 6)
-    //     displayScore6(x, y);
-    // else if (num == 7)
-    //     displayScore7(x, y);
-    // else if (num == 8)
-    //     displayScore8(x, y);
-    // else if (num == 9)
-    //     displayScore9(x, y);
-    // else if (num == 0)
-    //     displayScore0(x, y);
-
     if (num == 1)
         drawString(x, y, "1", "white");
     else if (num == 2)
@@ -1072,19 +1054,33 @@ void endScreen(int won, World *world)
         drawScore(world, type);
         displayGameOverImage(300, 100);
     }
+
+    // Display message prompt user to exit game or continue playing
     while (!restartGame)
-    {
+    {   
+        
         char character = uart_getc();
 
-        if (character == 'o')
+        if (character == ' ')
         {
-            quitGame = 1;
-            uart_puts("\n\nSuccessfully out!\n");
-            return;
-        }
-        if (character == 'r')
-        {
-            restartGame = 1;
+            drawString(50, 180, "------------------", "yellow");
+            drawString(285, 250, "PRESS KEY", "bright magenta");
+            drawString(160, 320, "TO RESTART - R", "bright red");
+            drawString(160, 390, "TO EXIT      - O", "bright green");
+            drawString(50, 460, "------------------", "bright blue");
+
+            char character = uart_getc();
+            if (character == 'o')
+            {
+                // quitGame = 1;
+                restartGame = 0;
+                uart_puts("\n\nSuccessfully out!\n");
+                break;
+            }
+            if (character == 'r')
+            {
+                restartGame = 1;
+            }
         }
     }
     if (won)
