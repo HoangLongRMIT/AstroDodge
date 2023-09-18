@@ -1,2 +1,2 @@
-void control_scrollable_image(int x, int y);
-void control_slideshow_image(int x, int y, int count);
+void controlScrollableImage(); // Function to display scrollable large image
+void controlSlideshowImage(int x, int y, int count); // Display slideshow of small images

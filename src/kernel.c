@@ -9,7 +9,7 @@
 #define HISTORY_STORAGE 20
 int count = 1;
 int x_coordinate = 100;
-int y_coordinate = 300;
+int y_coordinate = 360;
 //======================================================================================//
 //               						CLI FUNCTION         						    //
 //======================================================================================//
@@ -158,26 +158,23 @@ void cli()
                 displayGameBackground(0, 0);
                 font();
             }
-		// Checking DISPLAY SMALL IMAGE COMMAND
+		// Checking DISPLAY SLIDESHOW OF SMALL IMAGES COMMAND
 		else if(comp_str(cli_buffer,"2") == 0)
             {
 				clearscreen(0,0);
-            control_slideshow_image(x_coordinate, y_coordinate, count);
-                // insert
+            	controlSlideshowImage(x_coordinate, y_coordinate, count);
             }
-		// Checking A SCROLLABLE LARGE IMAGE COMMAND
+		// Checking SCROLLABLE LARGE IMAGE COMMAND
 		else if(comp_str(cli_buffer,"3") == 0)
-            {clearscreen(0,0);
-            control_scrollable_image(x_coordinate, y_coordinate);
-
-                // insert
+            {
+				clearscreen(0,0);
+				controlScrollableImage();
             }
         // Checking A VIDEO COMMAND
 		else if (comp_str(cli_buffer, "4") == 0)
             {
-				 clearscreen(0,0);
-            display_Video(x_coordinate, y_coordinate);
-                // insert
+				clearscreen(0,0);
+            	displayVideo(x_coordinate, y_coordinate);
             }
 		// Checking if PLAY GAME COMMAND
 		else if(comp_str(cli_buffer, "5") == 0)

@@ -93,7 +93,7 @@ void displayMenu()
     uart_puts(
         "\n\tEnter a number to choose command:\n"
         "\t1.\tDisplay text on screen\n"
-        "\t2.\tDisplay a small image\n"
+        "\t2.\tDisplay a slideshow of small images\n"
         "\t3.\tDisplay a scrollable large image\n"
         "\t4.\tDisplay a video\n"
         "\t5.\tPlay game\n"
