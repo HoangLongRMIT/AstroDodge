@@ -296,6 +296,7 @@ void move_entity(Entity *entity, Direction direction)
     }
 }
 // void update_movement_system(World *world) {
+//----------------------------------------------------------------------------
 void update_player_position(World *world)
 {
     if (world->player.needs_update)
@@ -409,13 +410,18 @@ void enemy_shoot(World *world)
     // printf("\n%d", random);
     entity_shoot(&world->enemies[world->shooters[random]], DOWN);
 }
+
+// Function to generate random number
+//----------------------------------------------------------------------------
 unsigned long int next = 1;
 int rand(void)
 {
     next = next * 1103515245 + 12345;
     return (unsigned int)(next / 65536) % 32768;
 }
+
 // Function to generate a random number between 100 and 900
+//----------------------------------------------------------------------------
 int randAsteroidPosition()
 {
     // Generate a random number between 0 and 800 (inclusive)
@@ -603,6 +609,8 @@ void resolve_collisions2(Missile *projectile, Missile *projectile2, World *world
     }
 }
 
+// Function to 
+//----------------------------------------------------------------------------
 void update_collision_system(World *world)
 {
     Entity *player = &world->player;
@@ -637,6 +645,9 @@ void update_shooters(World *world, int index)
         }
     }
 }
+
+// Function to update the score and health from gameplay
+//----------------------------------------------------------------------------
 void update_combat_system(World *world)
 {
 
@@ -682,7 +693,9 @@ int enemies_at_bottom(World *world)
             world->enemies[bottom_most].dimension.height) >
            ENEMIES_VERTICAL_MAX;
 }
+
 // Draw the enity using the data has set
+//----------------------------------------------------------------------------
 void render(World *world)
 {
     wait_msec(30000);
@@ -784,6 +797,8 @@ void render(World *world)
     }
 }
 
+// Function to get the score
+//----------------------------------------------------------------------------
 void drawScore(World *world, char *type)
 {
     int x = 0;
@@ -842,6 +857,8 @@ void drawScore(World *world, char *type)
     }
 }
 
+// Function to display health (have 3 hearts in total)
+//----------------------------------------------------------------------------
 void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
@@ -875,41 +892,69 @@ void render_health(World *world)
     world->life.needs_render = 0;
 }
 
+// Function to clear 1 heart health whenever spaceship gets hit
+//----------------------------------------------------------------------------
 void clear_health(int x, int y)
 {
-    for (int h = 0; h < x; h++)
-    {
-        for (int w = 0; w < y; w++)
-        {
-            drawPixelARGB32(w, h, 0);
-        }
-    }
+    // for (int h = 0; h < x; h++)
+    // {
+    //     for (int w = 0; w < y; w++)
+    //     {
+    //         drawPixelARGB32(w, h, 0);
+    //     }
+    // }
+    drawString(x, y, ' ', "black");
 }
 
+
+// Function to display score with font
+//----------------------------------------------------------------------------
 void render_score(int num, int x, int y)
 {
+    // if (num == 1)
+    //     displayScore1(x, y);
+    // else if (num == 2)
+    //     displayScore2(x, y);
+    // else if (num == 3)
+    //     displayScore3(x, y);
+    // else if (num == 4)
+    //     displayScore4(x, y);
+    // else if (num == 5)
+    //     displayScore5(x, y);
+    // else if (num == 6)
+    //     displayScore6(x, y);
+    // else if (num == 7)
+    //     displayScore7(x, y);
+    // else if (num == 8)
+    //     displayScore8(x, y);
+    // else if (num == 9)
+    //     displayScore9(x, y);
+    // else if (num == 0)
+    //     displayScore0(x, y);
 
     if (num == 1)
-        displayScore1(x, y);
+        drawString(x, y, "1", "white");
     else if (num == 2)
-        displayScore2(x, y);
+        drawString(x, y, "2", "white");
     else if (num == 3)
-        displayScore3(x, y);
+        drawString(x, y, "3", "white");
     else if (num == 4)
-        displayScore4(x, y);
+        drawString(x, y, "4", "white");
     else if (num == 5)
-        displayScore5(x, y);
+        drawString(x, y, "5", "white");
     else if (num == 6)
-        displayScore6(x, y);
+        drawString(x, y, "6", "white");
     else if (num == 7)
-        displayScore7(x, y);
+        drawString(x, y, "7", "white");
     else if (num == 8)
-        displayScore8(x, y);
+        drawString(x, y, "8", "white");
     else if (num == 9)
-        displayScore9(x, y);
+        drawString(x, y, "9", "white");
     else if (num == 0)
-        displayScore0(x, y);
+        drawString(x, y, "0", "white");
 }
+
+
 
 void init_life(Entity *life)
 {
