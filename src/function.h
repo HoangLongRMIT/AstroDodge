@@ -37,6 +37,8 @@ void clearscreen(int x, int y);
 //Welcome text
 void welcome_text();
 void tostring(char str[], int num);
+int string_length(char *str);
+void integer_to_string(int n, char *str);
 
 
 
