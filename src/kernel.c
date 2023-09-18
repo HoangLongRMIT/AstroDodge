@@ -157,7 +157,7 @@ void cli()
 		if (comp_str(cli_buffer, "1") == 0)
             {
                 clearscreen(0, 0);
-                displayGameBackground(0, 0);
+                displayGameUniverseBackground(0, 0);
                 font();
             }
 		// Checking DISPLAY SMALL IMAGE COMMAND

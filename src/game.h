@@ -45,7 +45,7 @@ static int travel_right = 0;
 static int quitGame;
 static int restartGame;
 static int pauseGame;
-
+static char str[50];
 typedef union {
     int current_health;
     int player_health;

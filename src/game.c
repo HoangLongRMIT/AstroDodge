@@ -640,7 +640,7 @@ void update_shooters(World *world, int index)
 void update_combat_system(World *world)
 {
 
-    if (world->playerScore.score > 250)
+    if (world->playerScore.score >= 300)
     {
         endScreen(1, world);
     }

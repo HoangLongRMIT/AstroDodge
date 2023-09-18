@@ -36,6 +36,7 @@ void clearscreen(int x, int y);
 //====================================================================================//
 //Welcome text
 void welcome_text();
+void tostring(char str[], int num);
 
 
 
