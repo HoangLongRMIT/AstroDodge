@@ -638,11 +638,6 @@ void update_shooters(World *world, int index)
 void update_combat_system(World *world)
 {
 
-    if (world->playerScore.score >= 300)
-    {
-        endScreen(1, world);
-    }
-
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -657,6 +652,10 @@ void update_combat_system(World *world)
             world->player.needs_clear = 1;
         }
         world->player.combat_update = 0;
+    if (world->playerScore.score >= 300)
+    {
+        endScreen(1, world);
+    }
         if (world->player.health.current_health == 0)
         {
             clearPlayerLife(170, 20);
@@ -682,7 +681,10 @@ int enemies_at_bottom(World *world)
 }
 // Draw the enity using the data has set
 void render(World *world)
-{
+{ if (quitGame)
+    {
+        return;
+    }
     wait_msec(30000);
 
     for (int i = 0; i < MAX_BULLETS; i++)
@@ -761,9 +763,8 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
-        drawExplosion(world->player);
+        drawExplosion2(world->player);
         wait_msec(500);
-        clear(world->player);
         world->player.needs_clear = 0;
     }
 
@@ -1037,16 +1038,7 @@ void endScreen(int won, World *world)
             restartGame = 1;
         }
     }
-    if (won)
-    {
-        drawScore(world, type);
-        displayGameWinImage(300, 100);
-    }
-    else
-    {
-        drawScore(world, type);
-        displayGameOverImage(300, 100);
-    }
+    
     return;
 }
 
