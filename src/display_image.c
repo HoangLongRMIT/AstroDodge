@@ -10,7 +10,6 @@
 #include "game_image.h"
 #include "life.h"
 #include "spaceship.h"
-#include "authors.h"
 #include "mbox.h"
 
 // Function to display first image
@@ -348,16 +347,7 @@ void displayPlayerLife(int x, int y)
   }
 }
 
-void displayAuthorsImage(int x, int y)
-{
-  for (int h = 0; h < authors_height_image; h++)
-  {
-    for (int w = 0; w < authors_width_image; w++)
-    {
-      drawPixelARGB32(x + w, y + h, authors_image[h * authors_width_image + w]);
-    }
-  }
-}
+
 
 // Function to display game win image
 void displayGameWinImage(int x, int y)
