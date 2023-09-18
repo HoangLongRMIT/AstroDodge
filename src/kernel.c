@@ -11,6 +11,8 @@
 int count = 1;
 int x_coordinate = 100;
 int y_coordinate = 300;
+int quitGame=0;
+int restartGame=0;
 //======================================================================================//
 //               						CLI FUNCTION         						    //
 //======================================================================================//
@@ -190,16 +192,17 @@ void cli()
 				show_main_menu(&game);
 				if (game.game_start)
 				{
-					displayGameBackground(0, 0);
+					displayGameUniverseBackground(0, 0);
 
 					while (!quitGame)
 					{
-						displayGameBackground(0, 0);
+						displayGameUniverseBackground(0, 0);
 
 						restart_game(&game);
 						move_player(&game.world);
 					}
 				}
+				clearscreen(0, 0);
             }
         // Checking CLEAR SCREEN COMMAND
 		else if(comp_str(cli_buffer, "0") == 0)

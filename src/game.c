@@ -6,7 +6,6 @@
 #include "game.h"
 // #include "spaceship.h"
 #include "display_image.h"
-#include "helper.h"
 #include "object.h"
 #include "printf.h"
 #include "game_universe_background_1.h"
@@ -49,7 +48,6 @@ void restart_game(Game *world)
     world->game_win = 0;
     restartGame = 0;
     displayGameUniverseBackground(0, 0);
-    // clear_emulator_screen(1920, 1080);
     pauseGame = 0;
     quitGame = 0;
 }
@@ -711,7 +709,6 @@ void render(World *world)
         if (world->enemies[i].needs_render && world->enemies[i].enabled)
         {
             clear(world->enemies[i]);
-            // clear_emulator_screen(1024, 768);
             drawEntity(world->enemies[i]);
 
             world->enemies[i].needs_render = 1; // 0 default
@@ -719,8 +716,6 @@ void render(World *world)
         else if (world->enemies[i].needs_clear)
         {
             clear(world->enemies[i]);
-            // clear_emulator_screen(1920, 1080);
-            // clear_emulator_screen(1024, 768);
             // fix bug bullet not clear
             for (int j = 0; j < MAX_BULLETS; j++)
             {
@@ -1015,7 +1010,7 @@ void endScreen(int won, World *world)
     char *type = "d";
     displayGameUniverseBackground(0, 0);
 
-    clear_emulator_screen(1024, 768);
+    clearscreen(0, 0);
 
     if (won)
     {
