@@ -59,8 +59,10 @@ void init_player(Entity *player)
     player->dimension.width = 72;
     player->position.x = (MAP_WIDTH / 2) - (player->dimension.width / 2);
     player->position.y = MAP_HEIGHT - 50;
-    for (int i = 0; i < MAX_BULLETS; i++)
+    for (int i = 0; i < MAX_BULLETS; i++){
         player->projectile[i].active = 0;
+    player->projectile[i].position.y = 100;
+        }
     player->health.current_health = 3;
     player->type = PLAYER;
     player->needs_update = 1;
@@ -648,7 +650,10 @@ void update_shooters(World *world, int index)
 //----------------------------------------------------------------------------
 void update_combat_system(World *world)
 {
-
+if (world->playerScore.score >= 300)
+        {
+            endScreen(1, world);
+        }
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -663,14 +668,10 @@ void update_combat_system(World *world)
             world->player.needs_clear = 1;
         }
         world->player.combat_update = 0;
-        if (world->playerScore.score >= 300)
-        {
-            endScreen(1, world);
-        }
         if (world->player.health.current_health == 0)
         {
             clearPlayerLife(170, 20);
-            displayScore0(170, 10);
+            drawString(170, 10, "0", "white");
             endScreen(0, world);
         }
     }
@@ -868,7 +869,7 @@ void render_health(World *world)
     if (clife == 0)
     {
         clearPlayerLife(170, 30);
-        displayScore0(170, 10);
+        drawString(170, 10, "0", "white");
     }
 
     if (clife == 1)
