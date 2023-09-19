@@ -11,7 +11,6 @@
 #include "game_universe_background_1.h"
 // #include "asteroid.h"
 
-
 int wait_time_shoot = 100;
 void init_game(Game *world)
 {
@@ -53,7 +52,6 @@ void restart_game(Game *world)
     displayGameUniverseBackground(0, 0);
     pauseGame = 0;
     quitGame = 0;
-   
 }
 // Setting the value for player
 void init_player(Entity *player)
@@ -62,10 +60,11 @@ void init_player(Entity *player)
     player->dimension.width = 72;
     player->position.x = (MAP_WIDTH / 2) - (player->dimension.width / 2);
     player->position.y = MAP_HEIGHT - 50;
-    for (int i = 0; i < MAX_BULLETS; i++){
+    for (int i = 0; i < MAX_BULLETS; i++)
+    {
         player->projectile[i].active = 0;
-    player->projectile[i].position.y = 100;
-        }
+        player->projectile[i].position.y = 100;
+    }
     player->health.current_health = 3;
     player->type = PLAYER;
     player->needs_update = 1;
@@ -82,7 +81,7 @@ void init_enemies(World *world)
     world->enemies[0].dimension.width = 0;
     world->enemies[0].type = 0;
     for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
-    {   
+    {
         world->enemies[i].needs_render = 0;
         world->enemies[i].needs_update = 1;
         world->enemies[i].enabled = 1;
@@ -149,7 +148,7 @@ void move_player(World *world)
             {
                 show_game_menu(world);
             }
-            
+
             update_AI_system(world);
             update_collision_system(world);
             update_combat_system(world);
@@ -416,13 +415,14 @@ void enemy_shoot(World *world)
 
     int random = (rand() % 100) % 10;
     // printf("\n%d", random);
-    if (isStage2) 
+    if (isStage2)
     {
         entity_shoot(&world->enemies[world->shooters[0]], DOWN);
     }
-    else{
-        entity_shoot(&world->enemies[world->shooters[random]], DOWN);}
-    
+    else
+    {
+        entity_shoot(&world->enemies[world->shooters[random]], DOWN);
+    }
 }
 
 // Function to generate random number
@@ -465,15 +465,17 @@ void entity_shoot(Entity *entity, Direction direction)
             }
             else
             {
-                if (isStage2) {
-                        entity->projectile[i].position.x =
+                if (isStage2)
+                {
+                    entity->projectile[i].position.x =
                         entity->position.x + (entity->dimension.width / 2);
                     entity->projectile[i].position.y =
                         entity->position.y + entity->dimension.height;
                     entity->projectile[i].dimension.height = green_laser.height;
                     entity->projectile[i].dimension.width = green_laser.width;
                 }
-                else {
+                else
+                {
                     entity->projectile[i].position.x =
                         randAsteroidPosition();
                     entity->projectile[i].position.y =
@@ -657,16 +659,16 @@ void update_collision_system(World *world)
                 }
             }
         }
-        if (isStage2) {
+        if (isStage2)
+        {
             for (int a = 0; a < MAX_BULLETS; a++)
+            {
+                if (player->projectile[a].active)
                 {
-                    if (player->projectile[a].active)
-                    {
-                        resolve_collisions(&player->projectile[a],&enemy[0]);
-                    }
+                    resolve_collisions(&player->projectile[a], &enemy[0]);
                 }
+            }
         }
-
     }
 }
 void update_shooters(World *world, int index)
@@ -684,24 +686,6 @@ void update_shooters(World *world, int index)
 //----------------------------------------------------------------------------
 void update_combat_system(World *world)
 {
-    if (world->playerScore.score >= 300)
-    {
-        isStage2 = 1;
-        if (isStage2 == 1 && check == 0)
-        {
-            check = 1;
-            world->enemies[0].position.x =
-                alien_initial_x + (HORIZONTAL_OFFSET * 0);
-            world->enemies[0].position.y =
-                alien_initial_y + 50;
-
-            world->enemies[0].dimension.height = boss_image.height;
-            world->enemies[0].dimension.width = boss_image.width;
-            world->enemies[0].health.current_health = BOSS_HEALTH;
-            world->enemies[0].type = BOSS;
-        }
-    }
-
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -723,23 +707,54 @@ void update_combat_system(World *world)
             endScreen(0, world);
         }
     }
+    if (world->playerScore.score >= 300)
+    {
+        isStage2 = 1;
+        if (isStage2 == 1 && check == 0)
+        {render(world);
+            for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
+            {
+                for (int j = 0; j < MAX_BULLETS; j++)
+                { clear_projectile(
+                    world->enemies[i].projectile[j].previous_pos,
+                    world->enemies[i].projectile[j].dimension);
+                    clear_projectile(
+                    world->enemies[i].projectile[j].position,
+                    world->enemies[i].projectile[j].dimension);
+                    world->enemies[i].projectile[j].active = 0;
+                    world->enemies[i].projectile[j].position.y = 1000;
+                }
+            }
 
-if (isStage2){
-  if (world->enemies[0].combat_update)
-        { drawExplosion(world->enemies[0]);
+            check = 1;
+            world->enemies[0].position.x =
+                alien_initial_x + (HORIZONTAL_OFFSET * 0);
+            world->enemies[0].position.y =
+                alien_initial_y + 50;
+
+            world->enemies[0].dimension.height = boss_image.height;
+            world->enemies[0].dimension.width = boss_image.width;
+            world->enemies[0].health.current_health = BOSS_HEALTH;
+            world->enemies[0].type = BOSS;
+        }
+    }
+
+    if (isStage2)
+    {
+        if (world->enemies[0].combat_update)
+        {
+            drawExplosion(world->enemies[0]);
             world->enemies[0].health.current_health -= 1;
             if (world->enemies[0].health.current_health <= 0)
             {
                 world->enemies[0].enabled = 0;
                 world->enemies[0].needs_clear = 1;
                 wait_msec(500);
-                 endScreen(1, world);
+                endScreen(1, world);
             }
             world->enemies[0].combat_update = 0;
-
         }
-        }
-
+    }
 }
 int enemies_at_bottom(World *world)
 {
@@ -1171,7 +1186,7 @@ void drawSpaceShip(Entity entity, World *world)
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
-    //printf("Score: %d\n", score);
+    // printf("Score: %d\n", score);
     if (entity.type == PLAYER)
     {
 
