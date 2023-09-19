@@ -6,7 +6,6 @@
 #include "game.h"
 // #include "spaceship.h"
 #include "display_image.h"
-#include "helper.h"
 #include "object.h"
 #include "printf.h"
 #include "game_universe_background_1.h"
@@ -49,7 +48,6 @@ void restart_game(Game *world)
     world->game_win = 0;
     restartGame = 0;
     displayGameUniverseBackground(0, 0);
-    // clear_emulator_screen(1920, 1080);
     pauseGame = 0;
     quitGame = 0;
 }
@@ -651,11 +649,6 @@ void update_shooters(World *world, int index)
 void update_combat_system(World *world)
 {
 
-    if (world->playerScore.score >= 300)
-    {
-        endScreen(1, world);
-    }
-
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -670,6 +663,10 @@ void update_combat_system(World *world)
             world->player.needs_clear = 1;
         }
         world->player.combat_update = 0;
+    if (world->playerScore.score >= 300)
+    {
+        endScreen(1, world);
+    }
         if (world->player.health.current_health == 0)
         {
             clearPlayerLife(170, 20);
@@ -697,7 +694,10 @@ int enemies_at_bottom(World *world)
 // Draw the enity using the data has set
 //----------------------------------------------------------------------------
 void render(World *world)
-{
+{ if (quitGame)
+    {
+        return;
+    }
     wait_msec(30000);
 
     for (int i = 0; i < MAX_BULLETS; i++)
@@ -724,7 +724,6 @@ void render(World *world)
         if (world->enemies[i].needs_render && world->enemies[i].enabled)
         {
             clear(world->enemies[i]);
-            // clear_emulator_screen(1024, 768);
             drawEntity(world->enemies[i]);
 
             world->enemies[i].needs_render = 1; // 0 default
@@ -732,8 +731,6 @@ void render(World *world)
         else if (world->enemies[i].needs_clear)
         {
             clear(world->enemies[i]);
-            // clear_emulator_screen(1920, 1080);
-            // clear_emulator_screen(1024, 768);
             // fix bug bullet not clear
             for (int j = 0; j < MAX_BULLETS; j++)
             {
@@ -779,9 +776,8 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
-        drawExplosion(world->player);
+        drawExplosion2(world->player);
         wait_msec(500);
-        clear(world->player);
         world->player.needs_clear = 0;
     }
 
@@ -1042,7 +1038,7 @@ void endScreen(int won, World *world)
     char *type = "d";
     displayGameUniverseBackground(0, 0);
 
-    clear_emulator_screen(1024, 768);
+    clearscreen(0, 0);
 
     if (won)
     {
@@ -1083,16 +1079,7 @@ void endScreen(int won, World *world)
             }
         }
     }
-    if (won)
-    {
-        drawScore(world, type);
-        displayGameWinImage(300, 100);
-    }
-    else
-    {
-        drawScore(world, type);
-        displayGameOverImage(300, 100);
-    }
+    
     return;
 }
 

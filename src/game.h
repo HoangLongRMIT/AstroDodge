@@ -42,8 +42,8 @@
 
 static int travel_right = 0;
 
-static int quitGame;
-static int restartGame;
+extern int quitGame;
+extern int restartGame;
 static int pauseGame;
 static char str[50];
 typedef union {
