@@ -39,7 +39,8 @@ void init_map(World *world)
     world->game_over = 0;
 }
 void restart_game(Game *world)
-{   clearscreen(0, 0);
+{
+    clearscreen(0, 0);
     init_map(&world->world);
     world->game_over = 0;
     world->game_start = 0;
@@ -78,12 +79,11 @@ void init_enemies(World *world)
         world->enemies[i].needs_update = 1;
         world->enemies[i].enabled = 1;
         world->enemies[i].combat_update = 0;
-        for (int j = 0; j < MAX_BULLETS; j++){
+        for (int j = 0; j < MAX_BULLETS; j++)
+        {
             world->enemies[i].projectile[j].active = 0;
-            world->enemies[i].projectile[j].position.y=1000;
+            world->enemies[i].projectile[j].position.y = 1000;
         }
-            
-            
     }
 
     for (int i = 0; i < MAX_SHOOTERS; i++)
@@ -227,7 +227,7 @@ void show_game_menu(World *world)
             if (world->game_menu.game_menu_option == 2)
             {
                 world->game_menu.on_gameMenu_menu = 0;
-                displayGameUniverseBackground(0,0);
+                displayGameUniverseBackground(0, 0);
                 printf("\nSELECT: Pause");
                 world->life.needs_render = 1;
                 world->playerScore.needsRender = 1;
@@ -236,14 +236,14 @@ void show_game_menu(World *world)
             }
             else if (world->game_menu.game_menu_option == 1)
             {
-                displayGameUniverseBackground(0,0);
+                displayGameUniverseBackground(0, 0);
                 printf("\nSELECT: Restart");
                 restartGame = 1;
                 return;
             }
             else if (world->game_menu.game_menu_option == 0)
             {
-                displayGameUniverseBackground(0,0);
+                displayGameUniverseBackground(0, 0);
                 printf("\nSELECT: Quit");
                 quitGame = 1;
                 return;
@@ -607,7 +607,7 @@ void resolve_collisions2(Missile *projectile, Missile *projectile2, World *world
     }
 }
 
-// Function to 
+// Function to
 //----------------------------------------------------------------------------
 void update_collision_system(World *world)
 {
@@ -663,10 +663,10 @@ void update_combat_system(World *world)
             world->player.needs_clear = 1;
         }
         world->player.combat_update = 0;
-    if (world->playerScore.score >= 300)
-    {
-        endScreen(1, world);
-    }
+        if (world->playerScore.score >= 300)
+        {
+            endScreen(1, world);
+        }
         if (world->player.health.current_health == 0)
         {
             clearPlayerLife(170, 20);
@@ -694,7 +694,8 @@ int enemies_at_bottom(World *world)
 // Draw the enity using the data has set
 //----------------------------------------------------------------------------
 void render(World *world)
-{ if (quitGame)
+{
+    if (quitGame)
     {
         return;
     }
@@ -803,7 +804,7 @@ void drawScore(World *world, char *type)
     {
         x = 350;
         y = 590;
-        
+
         // Print the score at end game
         displayScore(700 - x, 3 + y);
     }
@@ -905,7 +906,6 @@ void clear_health(int x, int y)
     drawString(x, y, ' ', "black");
 }
 
-
 // Function to display score with font
 //----------------------------------------------------------------------------
 void render_score(int num, int x, int y)
@@ -931,8 +931,6 @@ void render_score(int num, int x, int y)
     else if (num == 0)
         drawString(x, y, "0", "white");
 }
-
-
 
 void init_life(Entity *life)
 {
@@ -990,7 +988,8 @@ void drawGameMenu(World *game)
             // uart_hex(colorptrMenu[i]);
             drawPixelARGB32(xMenu, yMenu, colorptrMenu[i]);
         }
-        else {
+        else
+        {
             drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
         }
         // drawPixel(xMenu, yMenu, colorptrMenu[i]);
@@ -1022,7 +1021,8 @@ void drawMainMenu(Game *game)
         {
             drawPixelARGB32(xMenu, yMenu, colorptrMenu[i]);
         }
-        else {
+        else
+        {
             drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
         }
     }
@@ -1050,36 +1050,27 @@ void endScreen(int won, World *world)
         drawScore(world, type);
         displayGameOverImage(300, 100);
     }
-
+    drawString(50, 180, "------------------", "yellow");
+    drawString(285, 250, "PRESS KEY", "bright magenta");
+    drawString(160, 320, "TO RESTART - R", "bright red");
+    drawString(160, 390, "TO EXIT      - O", "bright green");
+    drawString(50, 460, "------------------", "bright blue");
     // Display message prompt user to exit game or continue playing
     while (!restartGame)
-    {   
-        
+    {
         char character = uart_getc();
-
-        if (character == ' ')
+        if (character == 'o')
         {
-            drawString(50, 180, "------------------", "yellow");
-            drawString(285, 250, "PRESS KEY", "bright magenta");
-            drawString(160, 320, "TO RESTART - R", "bright red");
-            drawString(160, 390, "TO EXIT      - O", "bright green");
-            drawString(50, 460, "------------------", "bright blue");
-
-            char character = uart_getc();
-            if (character == 'o')
-            {
-                // quitGame = 1;
-                restartGame = 0;
-                uart_puts("\n\nSuccessfully out!\n");
-                break;
-            }
-            if (character == 'r')
-            {
-                restartGame = 1;
-            }
+            quitGame = 1;
+            uart_puts("\n\nSuccessfully out!\n");
+            break;
+        }
+        if (character == 'r')
+        {
+            restartGame = 1;
         }
     }
-    
+
     return;
 }
 
