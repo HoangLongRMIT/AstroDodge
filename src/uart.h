@@ -19,5 +19,3 @@ void uart_sendc(char c);
 char uart_getc();
 void uart_puts(char *s);
 char uart_get_char();
-char uart_getc_game();
-void wait_msec(unsigned int n);

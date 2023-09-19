@@ -7,11 +7,6 @@
 #include "framebf.h"
 #include "function.h"
 #include "font.h"
-#include "display_image.h"
-#include "game.h"
-#include "object.h"
-#include "game_universe_background_2.h"
-// #include "terminal.h"
 
 
 // Use RGBA32 (32 bits for each pixel)
@@ -112,20 +107,6 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
      */
     // Access 32-bit together
     *((unsigned int *)(fb + offs)) = attr;
-}
-void drawPixelARGB32noBackground(int x, int y, unsigned int attr)
-{
-    int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
-    /* //Access and assign each byte
-     *(fb + offs ) = (attr >> 0 ) & 0xFF; //BLUE
-     *(fb + offs + 1) = (attr >> 8 ) & 0xFF; //GREEN
-     *(fb + offs + 2) = (attr >> 16) & 0xFF; //RED
-     *(fb + offs + 3) = (attr >> 24) & 0xFF; //ALPHA
-     */
-    // Access 32-bit together
-    if (attr !=  0x00000000){
-        *((unsigned int *)(fb + offs)) = attr;
-    }
 }
 
 // Function to draw rectangle
@@ -325,7 +306,7 @@ void font()
     drawString(5, 20, "EEET2490 ASM3", "yellow");
         drawString(5, 80, "--------------", "white");
 
-    drawString(5, 180, "LE ANH QUAN", "bright blue");
+    drawString(5, 180, "LE ANH QUAN", "blue");
         drawString(20, 240, "S3877457", "cyan");
 
     drawString(5, 340, "TRAN VINH TRONG", "bright red");
@@ -339,11 +320,8 @@ void font()
 }
 
 
-//==================================================================================================//
-//                                  FRAME AND GAME MECHANICS                                        //
-//==================================================================================================//
+
 // Draw list of frame images in video
-//----------------------------------------------------------------------------
 void display_frame_image(unsigned int frame_image[], int x, int y, int width,
                          int height) {
     int num = 0;
@@ -356,83 +334,5 @@ void display_frame_image(unsigned int frame_image[], int x, int y, int width,
         }
         y++;
         x = 0;
-    }
-}
-
-// Function to clear projectile
-//----------------------------------------------------------------------------
-void clear_projectile(Position position, Dimension dimension) {
-    int width = dimension.width;
-    int height = dimension.height;
-
-    int x = position.x;
-    int oldX = x;
-    int y = position.y;
-
-    for (int i = 0; i < (width * height); i++) {
-        x++;
-        if (i % width == 0) {
-            y++;
-            x = oldX;
-        }
-        drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
-    }
-}
-// Function to draw projectile
-//----------------------------------------------------------------------------
-void draw_projectile(Type type, Position position, Dimension dimension) {
-    int *colorptr;
-    int width = dimension.width;
-    int height = dimension.height;
-
-    if (type != PLAYER)
-        colorptr = (int *)asteroid_image.image_pixels;
-    else
-        colorptr = (int *)red_laser.image_pixels;
-
-    int x = position.x;
-    int oldX = x;
-    int y = position.y;
-    for (int i = 0; i < (width * height); i++) {
-        x++;
-        if (i % width == 0) {
-            y++;
-            x = oldX;
-        }
-        // Get the pixel color
-        uint32_t pixelColor = colorptr[i];
-        
-        if (colorptr[i] != 0xFF000000)
-        {
-            drawPixelARGB32(x, y, pixelColor);
-        }
-        else {
-            drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
-        }
-        
-    }
-}
-
-// Draw an object like ship , alien with pixel data in object.h
-//----------------------------------------------------------------------------
-void drawEntity(Entity entity) {
-    int *colorptr;
-    int width = entity.dimension.width;
-    int height = entity.dimension.height;
-
-    int x = entity.position.x;
-    int oldX = x;
-    int y = entity.position.y;
-
-   if (entity.type == PLAYER)
-        colorptr = (int *)blue_ship_sprite.image_pixels;
-    // draw in 2D
-    for (int i = 0; i < (width * height); i++) {
-        x++;
-        if (i % width == 0) {
-            y++;
-            x = oldX;
-        }
-        drawPixelARGB32(x, y, colorptr[i]);
     }
 }

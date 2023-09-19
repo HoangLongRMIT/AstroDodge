@@ -4,7 +4,6 @@
 #include "mbox.h"
 #include "framebf.h"
 #include "game_background.h"
-#include "game_universe_background.h"
 
 
 //====================================================================================//
@@ -71,17 +70,6 @@ void displayGameBackground(int x, int y){
     }
   }
 }
-// Function to display the screen background universe image
-//--------------------------------------------------------------------------------
-void displayGameUniverseBackground(int x, int y){
-  for (int h = 0; h < universe_background_height; h++)
-  {
-    for (int w = 0; w < universe_background_width; w++)
-    {
-      drawPixelARGB32(x + w, y + h, background_universe_image[h * universe_background_width + w]);
-    }
-  }
-}
 // Function to clear emulator screen
 //--------------------------------------------------------------------------------
 void clearscreen(int x, int y){
@@ -105,7 +93,7 @@ void displayMenu()
     uart_puts(
         "\n\tEnter a number to choose command:\n"
         "\t1.\tDisplay text on screen\n"
-        "\t2.\tDisplay a small image\n"
+        "\t2.\tDisplay a slideshow of small images\n"
         "\t3.\tDisplay a scrollable large image\n"
         "\t4.\tDisplay a video\n"
         "\t5.\tPlay game\n"
@@ -135,58 +123,4 @@ void welcome_text(){
 				  uart_puts("     \x1b[33mDeveloped by GROUP 12");
 				  uart_puts("\n\n\x1b[37m");
 	uart_puts("\n----------------------------------------------------------------------------------------------\n");
-}
-
-void tostring(char str[], int num)
-{
-    int i, rem, len = 0, n;
- 
-    n = num;
-    while (n != 0)
-    {
-        len++;
-        n /= 10;
-    }
-    for (i = 0; i < len; i++)
-    {
-        rem = num % 10;
-        num = num / 10;
-        str[len - (i + 1)] = rem + '0';
-    }
-    str[len] = '\0';
-}
-// Generate a function to find the length of the string
-int string_length(char *str)
-{
-  int i = 0;
-  while (str[i] != '\0')
-  {
-    i++;
-  }
-  return i;
-}
-
-// Generate a function convert integer to string and return string
-void integer_to_string(int n, char *str)
-{
-  int i = 0;
-  while (n != 0)
-  {
-    int rem = n % 10;
-    str[i] = rem + '0';
-    n = n / 10;
-    i++;
-  }
-  str[i] = '\0';
-  // reverse the string
-  int j = 0;
-  int k = string_length(str) - 1;
-  while (j < k)
-  {
-    char temp = str[j];
-    str[j] = str[k];
-    str[k] = temp;
-    j++;
-    k--;
-  }
 }

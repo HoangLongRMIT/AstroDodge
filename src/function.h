@@ -25,8 +25,6 @@ void displayMenu();
 //====================================================================================//
 // Function to display the screen background image
 void displayGameBackground(int x, int y);
-// Function to display the screen background universe image
-void displayGameUniverseBackground(int x, int y);
 // Function to clear emulator screen
 void clearscreen(int x, int y);
 
@@ -36,9 +34,6 @@ void clearscreen(int x, int y);
 //====================================================================================//
 //Welcome text
 void welcome_text();
-void tostring(char str[], int num);
-int string_length(char *str);
-void integer_to_string(int n, char *str);
 
 
 

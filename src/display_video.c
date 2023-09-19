@@ -2,7 +2,8 @@
 #include "running_video.h"
 #include "uart.h"
 
-void video_wait_ms(unsigned int n) {
+// Function to make delay interrupt in millisecond
+void delay_ms(unsigned int n) {
     register unsigned long f, t, r;
 
     // Get the current counter frequency
@@ -17,7 +18,7 @@ void video_wait_ms(unsigned int n) {
 }
 
 // Function to display video
-void display_Video(int x, int y) {
+void displayVideo(int x, int y) {
     // Add message to prompt the user how to use
     uart_puts("Video is playing ...\n");
     uart_puts("Press x to stop ");
@@ -28,7 +29,8 @@ void display_Video(int x, int y) {
         for (int i = 0; i < NUM_FRAMES; i++) {
             // display each frame image
             display_frame_image(sample_video[i], x, y, video_width, video_height + y);
-            video_wait_ms(100000);
+            //Delay a second
+            delay_ms(100000);
         }
         character = uart_get_char();
     }
