@@ -10,7 +10,7 @@ unsigned int vgapal[] = {
 	
 	0x000000,	// 2. Black
     0x0000AA,	// 3. Blue 
-    0x00AA00,	// 4. GReen
+    0x00AA00,	// 4. Green
     0x00AAAA,	// 5. Cyan
     0xAA0000,	// 6. Red
     0xAA00AA,	// 7. Magenta

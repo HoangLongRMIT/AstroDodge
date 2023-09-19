@@ -238,7 +238,7 @@ void main()
     // Initialize frame buffer
     framebf_init();
 
-	displayGameUniverseBackground(0, 0);
+	// displayGameUniverseBackground(0, 0);
 
     // Print welcome interface
     displayMenu();
