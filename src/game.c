@@ -11,8 +11,7 @@
 #include "game_universe_background_1.h"
 // #include "asteroid.h"
 
-static int isStage2 = 0;
-static int check = 0;
+
 int wait_time_shoot = 100;
 void init_game(Game *world)
 {
@@ -24,7 +23,8 @@ void init_game(Game *world)
     restartGame = 0;
     pauseGame = 0;
     quitGame = 0;
-
+    isStage2 = 0;
+    check = 0;
     init_map(&world->world);
     framebf_init();
 }
@@ -53,6 +53,7 @@ void restart_game(Game *world)
     displayGameUniverseBackground(0, 0);
     pauseGame = 0;
     quitGame = 0;
+   
 }
 // Setting the value for player
 void init_player(Entity *player)
@@ -77,11 +78,15 @@ void init_player(Entity *player)
 // Setting the value for enemies
 void init_enemies(World *world)
 {
+    world->enemies[0].dimension.height = 0;
+    world->enemies[0].dimension.width = 0;
+    world->enemies[0].type = 0;
     for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
     {   
         world->enemies[i].needs_render = 0;
         world->enemies[i].needs_update = 1;
         world->enemies[i].enabled = 1;
+        world->enemies[i].health.current_health = 1;
         world->enemies[i].combat_update = 0;
         for (int j = 0; j < MAX_BULLETS; j++)
         {
@@ -415,9 +420,9 @@ void enemy_shoot(World *world)
     {
         entity_shoot(&world->enemies[world->shooters[0]], DOWN);
     }
-    else {
-        entity_shoot(&world->enemies[world->shooters[random]], DOWN);
-    }
+    else{
+        entity_shoot(&world->enemies[world->shooters[random]], DOWN);}
+    
 }
 
 // Function to generate random number
@@ -465,8 +470,8 @@ void entity_shoot(Entity *entity, Direction direction)
                         entity->position.x + (entity->dimension.width / 2);
                     entity->projectile[i].position.y =
                         entity->position.y + entity->dimension.height;
-                    entity->projectile[i].dimension.height = red_laser.height;
-                    entity->projectile[i].dimension.width = red_laser.width;
+                    entity->projectile[i].dimension.height = green_laser.height;
+                    entity->projectile[i].dimension.width = green_laser.width;
                 }
                 else {
                     entity->projectile[i].position.x =
@@ -652,6 +657,16 @@ void update_collision_system(World *world)
                 }
             }
         }
+        if (isStage2) {
+            for (int a = 0; a < MAX_BULLETS; a++)
+                {
+                    if (player->projectile[a].active)
+                    {
+                        resolve_collisions(&player->projectile[a],&enemy[0]);
+                    }
+                }
+        }
+
     }
 }
 void update_shooters(World *world, int index)
@@ -682,12 +697,9 @@ void update_combat_system(World *world)
 
             world->enemies[0].dimension.height = boss_image.height;
             world->enemies[0].dimension.width = boss_image.width;
-            world->enemies[0].health.current_health = PAWN_HEALTH;
-            world->enemies[0].type = PAWN;
+            world->enemies[0].health.current_health = BOSS_HEALTH;
+            world->enemies[0].type = BOSS;
         }
-        // init_enemies(world);
-        
-        // endScreen(1, world);
     }
 
     if (world->player.combat_update)
@@ -711,6 +723,23 @@ void update_combat_system(World *world)
             endScreen(0, world);
         }
     }
+
+if (isStage2){
+  if (world->enemies[0].combat_update)
+        { drawExplosion(world->enemies[0]);
+            world->enemies[0].health.current_health -= 1;
+            if (world->enemies[0].health.current_health <= 0)
+            {
+                world->enemies[0].enabled = 0;
+                world->enemies[0].needs_clear = 1;
+                wait_msec(500);
+                 endScreen(1, world);
+            }
+            world->enemies[0].combat_update = 0;
+
+        }
+        }
+
 }
 int enemies_at_bottom(World *world)
 {
@@ -986,7 +1015,7 @@ void init_playerScore(Score *playerScore)
 void update_score(World *world)
 {
 
-    world->playerScore.score += 30;
+    world->playerScore.score += 100;
 }
 
 void *memcpy(void *dest, const void *src, unsigned long n)
@@ -1142,7 +1171,7 @@ void drawSpaceShip(Entity entity, World *world)
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
-    printf("Score: %d\n", score);
+    //printf("Score: %d\n", score);
     if (entity.type == PLAYER)
     {
 

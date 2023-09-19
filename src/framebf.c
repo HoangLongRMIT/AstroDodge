@@ -385,14 +385,16 @@ void draw_projectile(Type type, Position position, Dimension dimension) {
     int width = dimension.width;
     int height = dimension.height;
 
-    if (type != PLAYER)
+    if (type != PLAYER){
+        if (type == BOSS) {
+        colorptr = (int *)green_laser.image_pixels;
+    } else
         colorptr = (int *)asteroid_image.image_pixels;
-    else
-        colorptr = (int *)red_laser.image_pixels;
-
-    if (type == PAWN) {
+    }
+    else if (type == PLAYER) {
         colorptr = (int *)red_laser.image_pixels;
     }
+    
 
     int x = position.x;
     int oldX = x;
@@ -428,7 +430,7 @@ void drawEntity(Entity entity) {
     int oldX = x;
     int y = entity.position.y;
 
-    if (entity.type == PAWN) {
+    if (entity.type == BOSS) {
         colorptr = (int *)boss_image.image_pixels;
     }
    if (entity.type == PLAYER)
