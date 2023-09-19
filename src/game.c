@@ -209,7 +209,7 @@ void show_game_menu(World *world)
 
         drawGameMenu(world);
         char character = uart_getc_game();
-        printf("\n%d", world->game_menu.game_menu_option);
+        //printf("\n%d", world->game_menu.game_menu_option);
         if (character == 'w') // up
         {
             if (world->game_menu.game_menu_option < 2)
@@ -864,7 +864,7 @@ void drawScore(World *world, char *type)
 void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
-    printf("health: %d\n", clife);
+    //printf("health: %d\n", clife);
     displayWordPlayerLife(13, 10);
 
     if (clife == 0)
@@ -1109,7 +1109,7 @@ void drawSpaceShip(Entity entity, World *world)
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
-    printf("Score: %d\n", score);
+    //printf("Score: %d\n", score);
     if (entity.type == PLAYER)
     {
 
