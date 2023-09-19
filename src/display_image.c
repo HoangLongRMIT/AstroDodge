@@ -12,6 +12,10 @@
 #include "spaceship.h"
 #include "mbox.h"
 
+//=======================================================================================//
+//                    FUNCTION DISPLAY SMALL AND LARGE IMAGES                            //
+//=======================================================================================//
+// 
 #define MAX_DOWN_HEIGHT 935
 #define BUFFER_STEP 40
 
@@ -47,7 +51,7 @@ void display_image_4(int x, int y)
       drawPixelARGB32(x + w, y + h, image4[h * image4_width + w]);
 }
 
-// Display selected images (image 1, image 3, image 4) as commanded with count starts at 1 in kernel.c
+// Display selected images
 void display_certain_image(int count, int x, int y)
 {
   if (count == 1)
@@ -105,31 +109,30 @@ void controlScrollableImage()
 	}
 }
 
-// Display slideshow of small images
-void controlSlideshowImage(int x, int y, int count)
+// Display slideshow of images
+void control_slideshow_image(int x, int y, int count)
 {
   // Prompt the user how to use
   uart_puts("Press a to switch left: \n");
   uart_puts("Press d to switch right: \n");
   uart_puts("Press x to out: \n");
-
+  // Assign value for screen width, height and value for each time scroll up or down
+  int screen_width = 1200;
+  int screen_height = 800;
   display_certain_image(count, x, y);
   while (1)
   {
     // Declare character variable to get user input
     char character = uart_getc();
-    // Backward the option of selected image in the range
     if (character == 'a')
     {
       //Reset image to make no trace of previous one
       clearscreen(0,0);
-      // 
       count--;
       if(count == 0)
         count = 3;
       display_certain_image(count, x, y);
     } 
-    // Forward the option of selected image in the range
     else if (character == 'd') 
     {
       //Reset image to make no trace of previous one

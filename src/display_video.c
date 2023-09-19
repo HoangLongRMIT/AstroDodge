@@ -1,9 +1,11 @@
 #include "framebf.h"
 #include "running_video.h"
 #include "uart.h"
-
-// Function to make delay interrupt in millisecond
-void delay_ms(unsigned int n) {
+//=======================================================================================//
+//                            FUNCTION DISPLAY VIDEO                                     //
+//=======================================================================================//
+// Function of Delay Interrupt in one second
+void wait_ms(unsigned int n) {
     register unsigned long f, t, r;
 
     // Get the current counter frequency
@@ -29,8 +31,7 @@ void displayVideo(int x, int y) {
         for (int i = 0; i < NUM_FRAMES; i++) {
             // display each frame image
             display_frame_image(sample_video[i], x, y, video_width, video_height + y);
-            //Delay a second
-            delay_ms(100000);
+            wait_ms(100000);
         }
         character = uart_get_char();
     }
