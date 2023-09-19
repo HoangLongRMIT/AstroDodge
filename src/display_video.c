@@ -21,11 +21,11 @@ void wait_ms(unsigned int n) {
 
 // Function to display video
 void displayVideo(int x, int y) {
-    // Add message to prompt the user how to use
+    // Add message to notify the user how to use
     uart_puts("Video is playing ...\n");
     uart_puts("Press x to stop ");
     char character = uart_get_char();
-    // Keep displaying the video until the user press s
+    // Keep displaying the video until the user press x
     while (character != 'x') {
         // // loop through all the frame image video
         for (int i = 0; i < NUM_FRAMES; i++) {
@@ -37,5 +37,5 @@ void displayVideo(int x, int y) {
     }
 
     // Add message to announce the user
-    uart_puts("\nStopping video ...");
+    uart_puts("\nStopping video ...\n");
 }

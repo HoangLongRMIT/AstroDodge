@@ -54,6 +54,7 @@ void display_image_4(int x, int y)
 // Display selected images
 void display_certain_image(int count, int x, int y)
 {
+  // Using count under user command to display certain selected images within range
   if (count == 1)
     display_image_1(x,y);
   else if (count == 2)
@@ -116,9 +117,7 @@ void control_slideshow_image(int x, int y, int count)
   uart_puts("Press a to switch left: \n");
   uart_puts("Press d to switch right: \n");
   uart_puts("Press x to out: \n");
-  // Assign value for screen width, height and value for each time scroll up or down
-  int screen_width = 1200;
-  int screen_height = 800;
+
   display_certain_image(count, x, y);
   while (1)
   {

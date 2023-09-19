@@ -162,7 +162,7 @@ void cli()
                 // displayGameUniverseBackground(0, 0);
                 font();
             }
-		// Checking DISPLAY SMALL IMAGE COMMAND
+		// Checking DISPLAY A SLIDESHOW OF SMALL IMAGES COMMAND
 		else if(comp_str(cli_buffer,"2") == 0)
             {
 				clearscreen(0,0);
