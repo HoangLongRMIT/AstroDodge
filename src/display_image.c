@@ -157,7 +157,10 @@ void control_slideshow_image(int x, int y, int count)
   }
 }
 
-// Function display score
+//=======================================================================================//
+//                            FUNCTION DISPLAY NUM SCORE                                 //
+//=======================================================================================//
+// 
 void displayScore(int x, int y)
 {
   for (int h = 0; h < word_score_height; h++)
@@ -280,6 +283,9 @@ void displayScore0(int x, int y)
   }
 }
 
+//=======================================================================================//
+//                          FUNCTION DISPLAY EXPLOSION EFFECT                            //
+//=======================================================================================//
 void displayExplosion(int x, int y)
 {
   for (int h = 0; h < explosion_height; h++)
@@ -303,6 +309,10 @@ void displayExplosion2(int x, int y)
   }
 }
 
+
+//=======================================================================================//
+//                                FUNCTION TO CLEAR IMAGE                                //
+//=======================================================================================//
 void clearScore(int num, int x, int y)
 {
   for (int h = 0; h < score_0_height; h++)
@@ -325,6 +335,10 @@ void clearPlayerLife(int x, int y)
   }
 }
 
+
+//=======================================================================================//
+//                              FUNCTION TO DISPLAY IMAGE                                //
+//=======================================================================================//
 void displayWordPlayerLife(int x, int y)
 {
   for (int h = 0; h < word_lives_height; h++)
@@ -336,6 +350,7 @@ void displayWordPlayerLife(int x, int y)
   }
 }
 
+// Function to display player live symbol (3 in total)
 void displayPlayerLife(int x, int y)
 {
   for (int h = 0; h < life_height; h++)
