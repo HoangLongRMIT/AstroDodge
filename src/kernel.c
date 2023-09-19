@@ -164,26 +164,26 @@ void cli()
                 displayGameUniverseBackground(0, 0);
                 font();
             }
-		// Checking DISPLAY SMALL IMAGE COMMAND
+		// Checking DISPLAY A SLIDESHOW OF SMALL IMAGES COMMAND
 		else if(comp_str(cli_buffer,"2") == 0)
             {
 				clearscreen(0,0);
             	control_slideshow_image(x_coordinate, y_coordinate, count);
-                // insert
+                // Display slideshow of images
             }
 		// Checking A SCROLLABLE LARGE IMAGE COMMAND
 		else if(comp_str(cli_buffer,"3") == 0)
-            {clearscreen(0,0);
-            control_scrollable_image(x_coordinate, y_coordinate);
-
-                // insert
+            {
+				clearscreen(0,0);
+            	controlScrollableImage();
+                // Display Scrollable large images
             }
         // Checking A VIDEO COMMAND
 		else if (comp_str(cli_buffer, "4") == 0)
             {
 				clearscreen(0,0);
-            	display_Video(x_coordinate, y_coordinate);
-                // insert
+            	displayVideo(x_coordinate, y_coordinate);
+                // Display video
             }
 		// Checking if PLAY GAME COMMAND
 		else if(comp_str(cli_buffer, "5") == 0)

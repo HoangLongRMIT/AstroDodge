@@ -1,6 +1,4 @@
-// -----------------------------------display_image.h -------------------------------------
-
-void control_scrollable_image(int x, int y);
+void controlScrollableImage();
 void control_slideshow_image(int x, int y, int count);
 
 void displayScore(int x, int y);
