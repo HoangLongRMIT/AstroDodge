@@ -21,8 +21,13 @@ void display_image_1(int x, int y)
 void display_image_2(int row)
 {
   for (int h = 0; h < image2_height; h++)
-    for (int w = 0; w < image2_width; w++)
+    for (int w = 0; w < image2_width; w++){
+    if ((h + row) * image2_width + w <= image2_height * image2_width){
       drawPixelARGB32(w, h, image2[(h + row) * image2_width + w]);
+      } else {drawPixelARGB32(w , h,0x000000);}
+
+//drawPixelARGB32(w, h, image2[(h + row) * image2_width + w]);
+      }
 }
 
 // Function to display third image
