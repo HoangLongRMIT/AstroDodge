@@ -113,6 +113,7 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     // Access 32-bit together
     *((unsigned int *)(fb + offs)) = attr;
 }
+
 void drawPixelARGB32noBackground(int x, int y, unsigned int attr)
 {
     int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
@@ -344,8 +345,7 @@ void font()
 //==================================================================================================//
 // Draw list of frame images in video
 //----------------------------------------------------------------------------
-void display_frame_image(unsigned int frame_image[], int x, int y, int width,
-                         int height) {
+void display_frame_image(unsigned int frame_image[], int x, int y, int width,int height) {
     int num = 0;
 
     while (y < height) {

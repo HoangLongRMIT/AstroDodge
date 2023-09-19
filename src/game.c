@@ -778,7 +778,8 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
-        drawExplosion2(world->player);
+        // drawExplosion2(world->player);
+        drawExplosion(world->player);
         wait_msec(500);
         world->player.needs_clear = 0;
     }
@@ -904,7 +905,7 @@ void clear_health(int x, int y)
     //         drawPixelARGB32(w, h, 0);
     //     }
     // }
-    drawString(x, y, ' ', "black");
+    drawString(x, y, " ", "black");
 }
 
 // Function to display score with font
@@ -1077,20 +1078,24 @@ void endScreen(int won, World *world)
 
 void drawExplosion(Entity entity)
 {
+    // int x = entity.position.x;
+    // int oldX = x;
+    // int y = entity.position.y;
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
+
     if (entity.type == PLAYER)
     {
         uart_puts("Dead \n");
         displayExplosion(x, y);
     }
 }
-void drawExplosion2(Missile entity)
+void drawExplosion2(Missile* entity)
 {
-    int x = entity.position.x;
+    int x = entity->position.x;
     int oldX = x;
-    int y = entity.position.y;
+    int y = entity->position.y;
 
     displayExplosion2(x, y);
 }

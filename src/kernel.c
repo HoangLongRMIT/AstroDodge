@@ -5,6 +5,8 @@
 #include "mbox.h"
 #include "framebf.h"
 #include "game.h"
+#include "display_image.h"
+#include "display_video.h"
 
 #define MAX_CMD_SIZE 100
 #define HISTORY_STORAGE 20
@@ -159,7 +161,7 @@ void cli()
 		if (comp_str(cli_buffer, "1") == 0)
             {
                 clearscreen(0, 0);
-                // displayGameUniverseBackground(0, 0);
+                displayGameUniverseBackground(0, 0);
                 font();
             }
 		// Checking DISPLAY SMALL IMAGE COMMAND
