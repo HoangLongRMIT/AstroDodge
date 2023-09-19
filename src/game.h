@@ -3,7 +3,8 @@
 #include "mbox.h"
 #include "uart.h"
 
-
+#define PAWN_HEALTH 1
+#define NUM_PAWNS 20
 
 #define NUM_ENEMIES (12)
 
@@ -69,7 +70,7 @@ typedef struct {
     int needsRender;
 } Score;
 
-typedef enum { PLAYER = 1, ENEMIES=2} Type;
+typedef enum { PLAYER = 1, ENEMIES=2, PAWN = 3} Type;
 
 typedef struct {
     Position position;

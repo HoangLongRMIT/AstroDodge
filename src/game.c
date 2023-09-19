@@ -11,6 +11,8 @@
 #include "game_universe_background_1.h"
 // #include "asteroid.h"
 
+static int isStage2 = 0;
+static int check = 0;
 int wait_time_shoot = 100;
 void init_game(Game *world)
 {
@@ -76,7 +78,7 @@ void init_player(Entity *player)
 void init_enemies(World *world)
 {
     for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
-    {
+    {   
         world->enemies[i].needs_render = 0;
         world->enemies[i].needs_update = 1;
         world->enemies[i].enabled = 1;
@@ -142,6 +144,7 @@ void move_player(World *world)
             {
                 show_game_menu(world);
             }
+            
             update_AI_system(world);
             update_collision_system(world);
             update_combat_system(world);
@@ -408,7 +411,13 @@ void enemy_shoot(World *world)
 
     int random = (rand() % 100) % 10;
     // printf("\n%d", random);
-    entity_shoot(&world->enemies[world->shooters[random]], DOWN);
+    if (isStage2) 
+    {
+        entity_shoot(&world->enemies[world->shooters[0]], DOWN);
+    }
+    else {
+        entity_shoot(&world->enemies[world->shooters[random]], DOWN);
+    }
 }
 
 // Function to generate random number
@@ -451,12 +460,22 @@ void entity_shoot(Entity *entity, Direction direction)
             }
             else
             {
-                entity->projectile[i].position.x =
-                    randAsteroidPosition();
-                entity->projectile[i].position.y =
-                    50;
-                entity->projectile[i].dimension.height = asteroid_image.height;
-                entity->projectile[i].dimension.width = asteroid_image.width;
+                if (isStage2) {
+                        entity->projectile[i].position.x =
+                        entity->position.x + (entity->dimension.width / 2);
+                    entity->projectile[i].position.y =
+                        entity->position.y + entity->dimension.height;
+                    entity->projectile[i].dimension.height = red_laser.height;
+                    entity->projectile[i].dimension.width = red_laser.width;
+                }
+                else {
+                    entity->projectile[i].position.x =
+                        randAsteroidPosition();
+                    entity->projectile[i].position.y =
+                        50;
+                    entity->projectile[i].dimension.height = asteroid_image.height;
+                    entity->projectile[i].dimension.width = asteroid_image.width;
+                }
             }
             entity->projectile[i].needs_update = 1;
             entity->projectile[i].needs_render = 1;
@@ -650,10 +669,27 @@ void update_shooters(World *world, int index)
 //----------------------------------------------------------------------------
 void update_combat_system(World *world)
 {
-if (world->playerScore.score >= 300)
+    if (world->playerScore.score >= 300)
+    {
+        isStage2 = 1;
+        if (isStage2 == 1 && check == 0)
         {
-            endScreen(1, world);
+            check = 1;
+            world->enemies[0].position.x =
+                alien_initial_x + (HORIZONTAL_OFFSET * 0);
+            world->enemies[0].position.y =
+                alien_initial_y + 50;
+
+            world->enemies[0].dimension.height = boss_image.height;
+            world->enemies[0].dimension.width = boss_image.width;
+            world->enemies[0].health.current_health = PAWN_HEALTH;
+            world->enemies[0].type = PAWN;
         }
+        // init_enemies(world);
+        
+        // endScreen(1, world);
+    }
+
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -1043,11 +1079,13 @@ void endScreen(int won, World *world)
 
     if (won)
     {
+        displayGameUniverseBackground(0, 0);
         drawScore(world, type);
         displayGameWinImage(300, 100);
     }
     else
     {
+        displayGameUniverseBackground(0, 0);
         drawScore(world, type);
         displayGameOverImage(300, 100);
     }

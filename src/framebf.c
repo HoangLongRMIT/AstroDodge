@@ -390,6 +390,10 @@ void draw_projectile(Type type, Position position, Dimension dimension) {
     else
         colorptr = (int *)red_laser.image_pixels;
 
+    if (type == PAWN) {
+        colorptr = (int *)red_laser.image_pixels;
+    }
+
     int x = position.x;
     int oldX = x;
     int y = position.y;
@@ -424,6 +428,9 @@ void drawEntity(Entity entity) {
     int oldX = x;
     int y = entity.position.y;
 
+    if (entity.type == PAWN) {
+        colorptr = (int *)boss_image.image_pixels;
+    }
    if (entity.type == PLAYER)
         colorptr = (int *)blue_ship_sprite.image_pixels;
     // draw in 2D
@@ -433,6 +440,12 @@ void drawEntity(Entity entity) {
             y++;
             x = oldX;
         }
-        drawPixelARGB32(x, y, colorptr[i]);
+        if (colorptr[i] != 0xFF000000)
+        {
+            drawPixelARGB32(x, y, colorptr[i]);
+        }
+        else {
+            drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+        }
     }
 }
