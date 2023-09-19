@@ -233,7 +233,7 @@ void displayExplosion2(int x, int y)
 //=======================================================================================//
 // Function to clear score
 //--------------------------------------------------------------------------
-void clearScore(int num, int x, int y)
+void clearScore(unsigned int num, int x, int y)
 {
   for (int h = 0; h < 50; h++)
   {
@@ -242,6 +242,9 @@ void clearScore(int num, int x, int y)
       drawPixelARGB32(x + w, y + h, 0);
     }
   }
+  // char ch = num;
+
+  // drawChar(ch, x, y, '2');
 }
 // Function to clear lives
 //--------------------------------------------------------------------------

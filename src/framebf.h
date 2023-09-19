@@ -15,6 +15,8 @@ void drawCircleARGB32(int centerX, int centerY, int radius, unsigned int attr);
 //==================================================================================================//
 // Function to draw pixel
 void drawPixel(int x, int y, unsigned char attr);
+// Function to draw character
+void drawChar(unsigned char ch, int x, int y, unsigned char attr);
 // Function print string with font
 void drawString(int x, int y, char *s, char* color);
 // Function print content with font
