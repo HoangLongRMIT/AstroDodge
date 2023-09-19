@@ -4,12 +4,15 @@
 #include "cli_function.h"
 #include "mbox.h"
 #include "framebf.h"
+#include "game.h"
 
 #define MAX_CMD_SIZE 100
 #define HISTORY_STORAGE 20
 int count = 1;
 int x_coordinate = 100;
-int y_coordinate = 360;
+int y_coordinate = 300;
+int quitGame=0;
+int restartGame=0;
 //======================================================================================//
 //               						CLI FUNCTION         						    //
 //======================================================================================//
@@ -30,6 +33,7 @@ void cli()
 	static int history_next = 1; 					// get the next recorded cli buffer in history array
 	int color_index = 0;			// Color index of cli
 	
+    Game game;
 
 	// IF CLI get TAB
 	//----------------------------------------------------------------------------------------
@@ -155,7 +159,7 @@ void cli()
 		if (comp_str(cli_buffer, "1") == 0)
             {
                 clearscreen(0, 0);
-                displayGameBackground(0, 0);
+                // displayGameUniverseBackground(0, 0);
                 font();
             }
 		// Checking DISPLAY SLIDESHOW OF SMALL IMAGES COMMAND
@@ -179,7 +183,23 @@ void cli()
 		// Checking if PLAY GAME COMMAND
 		else if(comp_str(cli_buffer, "5") == 0)
             {
-                // insert
+                clearscreen(0, 0);
+                displayGameBackground(0, 0);
+				init_game(&game);
+				show_main_menu(&game);
+				if (game.game_start)
+				{
+					displayGameUniverseBackground(0, 0);
+
+					while (!quitGame)
+					{
+						displayGameUniverseBackground(0, 0);
+
+						restart_game(&game);
+						move_player(&game.world);
+					}
+				}
+				clearscreen(0, 0);
             }
         // Checking CLEAR SCREEN COMMAND
 		else if(comp_str(cli_buffer, "0") == 0)
