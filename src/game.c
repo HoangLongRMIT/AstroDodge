@@ -49,6 +49,8 @@ void restart_game(Game *world)
     world->main_menu.game_start_menu = 1;
     world->game_win = 0;
     restartGame = 0;
+    isStage2 = 0;
+    check = 0;
     displayGameUniverseBackground(0, 0);
     pauseGame = 0;
     quitGame = 0;
