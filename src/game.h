@@ -182,6 +182,11 @@ void show_main_menu(Game *game) ;
 void drawScore(World *world,char *type);
 void init_playerScore(Score *playerScore);
 void endScreen(int won, World *world) ;
+
+//-----------------------------------------------------
+void drawExplosion(Entity entity);
+void drawExplosion2(Missile* entity);
+
 void restart_game(Game *world);
 void drawSpaceShip(Entity entity, World *world);
 

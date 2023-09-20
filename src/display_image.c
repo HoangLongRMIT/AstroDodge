@@ -12,7 +12,15 @@
 #include "spaceship.h"
 #include "mbox.h"
 
+//=======================================================================================//
+//                    FUNCTION DISPLAY SMALL AND LARGE IMAGES                            //
+//=======================================================================================//
+// 
+#define MAX_DOWN_HEIGHT 935
+#define BUFFER_STEP 40
+
 // Function to display first image
+//--------------------------------------------------------------------------
 void display_image_1(int x, int y)
 {
   for (int h = 0; h < image1_height; h++)
@@ -20,15 +28,16 @@ void display_image_1(int x, int y)
       drawPixelARGB32(x + w, y + h, image1[h * image1_width + w]);
 }
 
-// Function to display second image
-void display_image_2(int x, int y)
+// Function to display second image to scroll
+void display_image_2(int row)
 {
   for (int h = 0; h < image2_height; h++)
     for (int w = 0; w < image2_width; w++)
-      drawPixelARGB32(x + w, y + h, image2[h * image2_width + w]);
+      drawPixelARGB32(w, h, image2[(h + row) * image2_width + w]);
 }
 
 // Function to display third image
+//--------------------------------------------------------------------------
 void display_image_3(int x, int y)
 {
   for (int h = 0; h < image3_height; h++)
@@ -37,6 +46,7 @@ void display_image_3(int x, int y)
 }
 
 // Function to display fourth image
+//--------------------------------------------------------------------------
 void display_image_4(int x, int y)
 {
   for (int h = 0; h < image4_height; h++)
@@ -45,8 +55,10 @@ void display_image_4(int x, int y)
 }
 
 // Display selected images
+//--------------------------------------------------------------------------
 void display_certain_image(int count, int x, int y)
 {
+  // Using count under user command to display certain selected images within range
   if (count == 1)
     display_image_1(x,y);
   else if (count == 2)
@@ -55,75 +67,62 @@ void display_certain_image(int count, int x, int y)
     display_image_3(x,y);
 }
 
-// Function to move vertical
-void moveVerticalScreen(int width, int height, int x, int y)
+// Function to display scrollable large image
+void controlScrollableImage()
 {
-  for (int h = 0; h < height; h++)
-    for (int w = 0; w < width; w++)
-      drawPixel(x + w, y + h, 0);
-}
 
-// Function to control oversize image
-void control_scrollable_image(int x, int y)
-{
-  // Prompt the user how to use
-  uart_puts("Press w to scroll up: \n");
-  uart_puts("Press s to scroll down: \n");
-  uart_puts("Press x to out: \n");
-  // Assign value for screen width, height and value for each time scroll up or down
-  int screen_width = 1200;
-  int screen_height = 800;
-  int scroll_vertical_value = 20;
-  display_image_2(x, y);
-  while (1)
-  {
+	framebf_init();
+  uart_puts("\nPress 'w' to scroll up \n");
+	uart_puts("Press 's' to scroll down \n");
+	uart_puts("Press x to exit image! \n\n");
+	
+  // Declare where the terminal will show at certain position of the image
+  int row = 200;
+  display_image_2(row);
+
+	while (1)
+	{
+    /*
+        NOTE:
+          In order to scroll down without a problem, during debug, this picture needs to press s for around 15 times with BUFFER_STEP to move down for 40 rows of image 2 height (1235).
+          So BUFFER_STEP (40) * 15 times = 600 rows to reach at the end of the image without going further.
+          Hence image 2 height (1235) - 600 = 935 which is the number for MAX_DOWN_HEIGHT as defined.
+          BUFFER_STEP can be any number but 40 in personal opinion is suitable in this situation.
+    */
+
     // Declare character variable to get user input
     char character = uart_getc();
-    // if character = w, scroll up -> screen up
-    if (character == 'w')
+    
+    // Scroll down the image withing the range of row to scroll as defined
+    if (character == 's' && (row <= image2_height - MAX_DOWN_HEIGHT - BUFFER_STEP))
+		{
+      row = row + BUFFER_STEP;
+			display_image_2(row);
+		}
+    // Scroll up the image withing the range of row to scroll as defined
+    else if (character == 'w' && (row >= BUFFER_STEP))
+		{
+			row = row - BUFFER_STEP;
+			display_image_2(row);
+		}
+		else if (character == 'x')
     {
-      // Move the screen
-      moveVerticalScreen(screen_width, scroll_vertical_value, x, y + screen_height - scroll_vertical_value);
-      // Calculate new y coordinate value
-      y = y - scroll_vertical_value;
-      //Reset image to make no trace of previous one
-      clearscreen(0,0);
-      // Display image
-      display_image_2(x, y);
-    }
-    // if character = s, scroll down -> screen down
-    else if (character == 's')
-    {
-      // Move the screen
-      moveVerticalScreen(screen_width, scroll_vertical_value, x, y);
-      // Calculate new y coordinate value
-      y = y + scroll_vertical_value;
-      //Reset image to make no trace of previous one
-      clearscreen(0,0);
-      // Display image
-      display_image_2(x, y);
-    }
-    // if character = o, out -> stop move screen
-    else if (character == 'x')
-    {
-      moveVerticalScreen(screen_width, scroll_vertical_value, x, y + screen_height - scroll_vertical_value);
       // Prompt message for user
       uart_puts("\n\nSuccessfully out!\n");
       return;
     }
-  }
+	}
 }
 
 // Display slideshow of images
+//--------------------------------------------------------------------------
 void control_slideshow_image(int x, int y, int count)
 {
   // Prompt the user how to use
   uart_puts("Press a to switch left: \n");
   uart_puts("Press d to switch right: \n");
   uart_puts("Press x to out: \n");
-  // Assign value for screen width, height and value for each time scroll up or down
-  int screen_width = 1200;
-  int screen_height = 800;
+
   display_certain_image(count, x, y);
   while (1)
   {
@@ -160,14 +159,31 @@ void control_slideshow_image(int x, int y, int count)
 //=======================================================================================//
 //                            FUNCTION DISPLAY NUM SCORE                                 //
 //=======================================================================================//
-// 
+// Function to display word "score"
+//--------------------------------------------------------------------------
 void displayScore(int x, int y)
 {
   for (int h = 0; h < word_score_height; h++)
   {
     for (int w = 0; w < word_score_width; w++)
     {
-      drawPixelARGB32(x + w, y + h, word_score_image[h * word_score_width + w]);
+      // drawPixelARGB32(x + w, y + h, word_score_image[h * word_score_width + w]);
+
+      // unsigned char mask = 1 << j;
+      unsigned long mask = 0xffff;
+
+      unsigned char *glyph = (unsigned char *)&word_score_image[h * word_score_width + w];
+            
+      // Get the coordinate to assign color - green
+      unsigned char col = (*glyph & mask) ? (4 & 0xff) : 1;
+
+      // Move to next column until reach the end of bitmap epd_bitmap_allArray
+      if (col != 1) {
+        // Fill pixel with current column while neglecting the background pixel
+        if ((unsigned char *)&word_score_image[h * word_score_width + w] != 0x0000){
+          drawPixel(x + w, y + h, col);
+        }
+      }
     }
   }
 }
@@ -176,6 +192,8 @@ void displayScore(int x, int y)
 //=======================================================================================//
 //                          FUNCTION DISPLAY EXPLOSION EFFECT                            //
 //=======================================================================================//
+// Function to display the player explosion
+//--------------------------------------------------------------------------
 void displayExplosion(int x, int y)
 {
   for (int h = 0; h < explosion_height; h++)
@@ -186,7 +204,8 @@ void displayExplosion(int x, int y)
     }
   }
 }
-
+// Function to display the asteroid explosion
+//--------------------------------------------------------------------------
 void displayExplosion2(int x, int y)
 {
   for (int h = 0; h < explosion2_height; h++)
@@ -203,7 +222,9 @@ void displayExplosion2(int x, int y)
 //=======================================================================================//
 //                                FUNCTION TO CLEAR IMAGE                                //
 //=======================================================================================//
-void clearScore(int num, int x, int y)
+// Function to clear score
+//--------------------------------------------------------------------------
+void clearScore(unsigned int num, int x, int y)
 {
   for (int h = 0; h < 50; h++)
   {
@@ -212,8 +233,12 @@ void clearScore(int num, int x, int y)
       drawPixelARGB32(x + w, y + h, 0);
     }
   }
-}
+  // char ch = num;
 
+  // drawChar(ch, x, y, '2');
+}
+// Function to clear lives
+//--------------------------------------------------------------------------
 void clearPlayerLife(int x, int y)
 {
   for (int h = 0; h < life_height; h++)
@@ -227,20 +252,39 @@ void clearPlayerLife(int x, int y)
 
 
 //=======================================================================================//
-//                              FUNCTION TO DISPLAY IMAGE                                //
+//                           FUNCTION TO DISPLAY/CLEAR LIVES                             //
 //=======================================================================================//
+// Function to display word "lives"
+//--------------------------------------------------------------------------
 void displayWordPlayerLife(int x, int y)
 {
   for (int h = 0; h < word_lives_height; h++)
   {
     for (int w = 0; w < word_lives_width; w++)
     {
-      drawPixelARGB32(x + w, y + h, word_lives_image[h * word_lives_width + w]);
+      // drawPixelARGB32(x + w, y + h, word_lives_image[h * word_lives_width + w]);
+
+      // unsigned char mask = 1 << j;
+      unsigned long mask = 0xffff;
+
+      unsigned char *glyph = (unsigned char *)&word_lives_image[h * word_lives_width + w];
+            
+      // Get the coordinate to assign color - bright magenta
+      unsigned char col = (*glyph & mask) ? (15 & 0xff) : 1;
+
+      // Move to next column until reach the end of bitmap epd_bitmap_allArray
+      if (col != 1) {
+        // Fill pixel with current column while neglecting the background pixel
+        if ((unsigned char *)&word_lives_image[h * word_lives_width + w] != 0x0000){
+          drawPixel(x + w, y + h, col);
+        }
+      }
     }
   }
 }
 
 // Function to display player live symbol (3 in total)
+//--------------------------------------------------------------------------
 void displayPlayerLife(int x, int y)
 {
   for (int h = 0; h < life_height; h++)
@@ -253,8 +297,11 @@ void displayPlayerLife(int x, int y)
 }
 
 
-
+//=======================================================================================//
+//                           FUNCTION TO DISPLAY ENDGAME                                 //
+//=======================================================================================//
 // Function to display game win image
+//--------------------------------------------------------------------------
 void displayGameWinImage(int x, int y)
 {
   for (int h = 0; h < game_win_height_image; h++)
@@ -267,6 +314,7 @@ void displayGameWinImage(int x, int y)
 }
 
 // Function to display game over image
+//--------------------------------------------------------------------------
 void displayGameOverImage(int x, int y)
 {
   for (int h = 0; h < game_over_height_image; h++)
@@ -278,7 +326,12 @@ void displayGameOverImage(int x, int y)
   }
 }
 
+
+//=======================================================================================//
+//                           FUNCTION TO DISPLAY ENDGAME                                 //
+//=======================================================================================//
 // Function to display space ship image without drawing green pixels
+//--------------------------------------------------------------------------
 void displaySpaceShipImage(int x, int y)
 {
   for (int h = 0; h < spaceship_height; h++)

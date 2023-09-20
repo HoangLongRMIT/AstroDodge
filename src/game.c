@@ -218,7 +218,7 @@ void show_game_menu(World *world)
 
         drawGameMenu(world);
         char character = uart_getc_game();
-        printf("\n%d", world->game_menu.game_menu_option);
+        //printf("\n%d", world->game_menu.game_menu_option);
         if (character == 'w') // up
         {
             if (world->game_menu.game_menu_option < 2)
@@ -860,7 +860,8 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
-        drawExplosion2(world->player);
+        // drawExplosion2(world->player);
+        drawExplosion(world->player);
         wait_msec(500);
         world->player.needs_clear = 0;
     }
@@ -945,7 +946,7 @@ void drawScore(World *world, char *type)
 void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
-    printf("health: %d\n", clife);
+    //printf("health: %d\n", clife);
     displayWordPlayerLife(13, 10);
 
     if (clife == 0)
@@ -986,7 +987,7 @@ void clear_health(int x, int y)
     //         drawPixelARGB32(w, h, 0);
     //     }
     // }
-    drawString(x, y, ' ', "black");
+    drawString(x, y, " ", "black");
 }
 
 // Function to display score with font
@@ -994,25 +995,25 @@ void clear_health(int x, int y)
 void render_score(int num, int x, int y)
 {
     if (num == 1)
-        drawString(x, y, "1", "white");
+        drawString(x, y, "1", "yellow");
     else if (num == 2)
-        drawString(x, y, "2", "white");
+        drawString(x, y, "2", "yellow");
     else if (num == 3)
-        drawString(x, y, "3", "white");
+        drawString(x, y, "3", "yellow");
     else if (num == 4)
-        drawString(x, y, "4", "white");
+        drawString(x, y, "4", "yellow");
     else if (num == 5)
-        drawString(x, y, "5", "white");
+        drawString(x, y, "5", "yellow");
     else if (num == 6)
-        drawString(x, y, "6", "white");
+        drawString(x, y, "6", "yellow");
     else if (num == 7)
-        drawString(x, y, "7", "white");
+        drawString(x, y, "7", "yellow");
     else if (num == 8)
-        drawString(x, y, "8", "white");
+        drawString(x, y, "8", "yellow");
     else if (num == 9)
-        drawString(x, y, "9", "white");
+        drawString(x, y, "9", "yellow");
     else if (num == 0)
-        drawString(x, y, "0", "white");
+        drawString(x, y, "0", "yellow");
 }
 
 void init_life(Entity *life)
@@ -1161,20 +1162,24 @@ void endScreen(int won, World *world)
 
 void drawExplosion(Entity entity)
 {
+    // int x = entity.position.x;
+    // int oldX = x;
+    // int y = entity.position.y;
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
+
     if (entity.type == PLAYER)
     {
         uart_puts("Dead \n");
         displayExplosion(x, y);
     }
 }
-void drawExplosion2(Missile entity)
+void drawExplosion2(Missile* entity)
 {
-    int x = entity.position.x;
+    int x = entity->position.x;
     int oldX = x;
-    int y = entity.position.y;
+    int y = entity->position.y;
 
     displayExplosion2(x, y);
 }

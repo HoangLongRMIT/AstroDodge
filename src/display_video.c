@@ -1,8 +1,11 @@
 #include "framebf.h"
 #include "running_video.h"
 #include "uart.h"
-
-void video_wait_ms(unsigned int n) {
+//=======================================================================================//
+//                            FUNCTION DISPLAY VIDEO                                     //
+//=======================================================================================//
+// Function of Delay Interrupt in one second
+void wait_ms(unsigned int n) {
     register unsigned long f, t, r;
 
     // Get the current counter frequency
@@ -17,22 +20,22 @@ void video_wait_ms(unsigned int n) {
 }
 
 // Function to display video
-void display_Video(int x, int y) {
-    // Add message to prompt the user how to use
+void displayVideo(int x, int y) {
+    // Add message to notify the user how to use
     uart_puts("Video is playing ...\n");
     uart_puts("Press x to stop ");
     char character = uart_get_char();
-    // Keep displaying the video until the user press s
+    // Keep displaying the video until the user press x
     while (character != 'x') {
         // // loop through all the frame image video
         for (int i = 0; i < NUM_FRAMES; i++) {
             // display each frame image
             display_frame_image(sample_video[i], x, y, video_width, video_height + y);
-            video_wait_ms(100000);
+            wait_ms(100000);
         }
         character = uart_get_char();
     }
 
     // Add message to announce the user
-    uart_puts("\nStopping video ...");
+    uart_puts("\nStopping video ...\n");
 }
