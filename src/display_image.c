@@ -12,6 +12,8 @@
 #include "spaceship.h"
 #include "mbox.h"
 
+#include "game_universe_background_3.h"
+
 //=======================================================================================//
 //                    FUNCTION DISPLAY SMALL AND LARGE IMAGES                            //
 //=======================================================================================//
@@ -226,11 +228,27 @@ void displayExplosion2(int x, int y)
 //--------------------------------------------------------------------------
 void clearScore(unsigned int num, int x, int y)
 {
-  for (int h = 0; h < 50; h++)
+  // for (int h = 0; h < 50; h++)
+  // {
+  //   for (int w = 0; w < 50; w++)
+  //   {
+  //     drawPixelARGB32(x + w, y + h, 0);
+  //   }
+  // }
+
+   for (int h = 0; h < 50; h++)
   {
     for (int w = 0; w < 50; w++)
     {
-      drawPixelARGB32(x + w, y + h, 0);
+      // Get the position x on the game background
+      int imageX = (x + w) % 1024;
+      // Get the position y on the game background
+      int imageY = (y + h) % 768;
+      // Get the color of that portion of game background
+      int PixelColor = background_universe_image_3[imageX + imageY * 1024];
+      
+      
+      drawPixelARGB32(x + w, y + h, PixelColor);
     }
   }
   // char ch = num;
