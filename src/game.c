@@ -212,13 +212,11 @@ void show_game_menu(World *world)
     pauseGame = 1;
     while (world->game_menu.on_gameMenu_menu)
     {
-        //    while (clock() < menu_timer)
-        //         ;
-        //     menu_timer = clock() + CLOCKS_PER_SEC / 4;
+
 
         drawGameMenu(world);
         char character = uart_getc_game();
-        //printf("\n%d", world->game_menu.game_menu_option);
+
         if (character == 'w') // up
         {
             if (world->game_menu.game_menu_option < 2)
@@ -412,11 +410,8 @@ void update_player_position(World *world)
 }
 void enemy_shoot(World *world)
 {
-    // if (clock() < before) return;
-    // before = clock() + CLOCKS_PER_SEC / 2;
 
     int random = (rand() % 100) % 10;
-    // printf("\n%d", random);
     if (isStage2)
     {
         entity_shoot(&world->enemies[world->shooters[0]], DOWN);
@@ -747,6 +742,7 @@ void update_combat_system(World *world)
         {
             drawExplosion(world->enemies[0]);
             world->enemies[0].health.current_health -= 1;
+             printf("Boss health: %d\n", world->enemies[0].health.current_health);
             if (world->enemies[0].health.current_health <= 0)
             {
                 world->enemies[0].enabled = 0;
@@ -946,7 +942,7 @@ void drawScore(World *world, char *type)
 void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
-    //printf("health: %d\n", clife);
+    printf("health: %d\n", clife);
     displayWordPlayerLife(13, 10);
 
     if (clife == 0)
@@ -1034,6 +1030,7 @@ void update_score(World *world)
 {
 
     world->playerScore.score += 100;
+     printf("Score: %d\n", world->playerScore.score);
 }
 
 void *memcpy(void *dest, const void *src, unsigned long n)
@@ -1193,7 +1190,7 @@ void drawSpaceShip(Entity entity, World *world)
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
-    // printf("Score: %d\n", score);
+    
     if (entity.type == PLAYER)
     {
 
