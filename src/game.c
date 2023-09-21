@@ -4,14 +4,13 @@
 #include "mbox.h"
 #include "framebf.h"
 #include "game.h"
-// #include "spaceship.h"
 #include "display_image.h"
 #include "object.h"
 #include "printf.h"
 #include "game_universe_background_1.h"
-// #include "asteroid.h"
 
 int wait_time_shoot = 100;
+//initalize the game
 void init_game(Game *world)
 {
     world->game_over = 0;
@@ -39,6 +38,7 @@ void init_map(World *world)
     world->game_menu.on_gameMenu_menu = 0;
     world->game_over = 0;
 }
+//restart the game
 void restart_game(Game *world)
 {
     clearscreen(0, 0);
@@ -116,15 +116,14 @@ void move_player(World *world)
         while (!pauseGame)
         {
             char character = uart_getc_game();
-            if (character != '\n' && character != '\b')
-            {
-            }
+            // if (character != '\n' && character != '\b')
+            // {
+            // }
             if (character == 'a')
             {
                 move_entity(&world->player, LEFT);
                 world->player.velocity.y = 0;
             }
-            // if character = s, scroll down -> screen down
             else if (character == 'd')
             {
                 move_entity(&world->player, RIGHT);
@@ -143,12 +142,12 @@ void move_player(World *world)
                 world->player.needs_update = 1;
             }
             else if (character == ' ')
-            {
+            {//space is shoot
                 entity_shoot(&world->player, UP);
             }
             else if (character == 'p')
-            {
-                show_game_menu(world);
+            {//pause the game
+                pause_menu(world);
             }
 
             update_AI_system(world);
@@ -171,14 +170,13 @@ void move_player(World *world)
         }
     }
 }
-
+//show main menu before game
 void show_main_menu(Game *game)
 {
 
     uart_puts("Press s to move down: \n");
     uart_puts("Press w to move up: \n");
     uart_puts("Press space to choose: \n");
-    // drawLogo();
     drawMainMenu(game);
     while (game->main_menu.on_game_menu)
     {
@@ -205,7 +203,8 @@ void show_main_menu(Game *game)
         }
     }
 }
-void show_game_menu(World *world)
+//display pause menu
+void pause_menu(World *world)
 {
     world->game_menu.game_menu_option = 1;
     world->game_menu.on_gameMenu_menu = 1;
@@ -214,7 +213,7 @@ void show_game_menu(World *world)
     {
 
 
-        drawGameMenu(world);
+        drawPauseMenu(world);
         char character = uart_getc_game();
 
         if (character == 'w') // up
@@ -231,7 +230,7 @@ void show_game_menu(World *world)
                 world->game_menu.game_menu_option--;
             }
         }
-        else if (character == ' ') // B
+        else if (character == ' ') // space to select
         {
             if (world->game_menu.game_menu_option == 2)
             {
@@ -261,7 +260,7 @@ void show_game_menu(World *world)
     }
     return;
 }
-
+//move player and enemy
 void move_entity(Entity *entity, Direction direction)
 {
     switch (direction)
@@ -302,8 +301,9 @@ void move_entity(Entity *entity, Direction direction)
         entity->needs_update = 1;
     }
 }
-// void update_movement_system(World *world) {
+
 //----------------------------------------------------------------------------
+//track player position and their collision
 void update_player_position(World *world)
 {
     if (world->player.needs_update)
@@ -346,19 +346,22 @@ void update_player_position(World *world)
             world->enemies[i].needs_render = 1;
             world->enemies[i].needs_update = 0;
         }
-        // Check if enemy hit player
-        if (world->enemies[i].position.x < world->player.position.x +
+        if (isStage2){
+        // Check if boss hit player then end game over
+        if (world->enemies[0].position.x < world->player.position.x +
                                                world->player.dimension.width &&
-            world->enemies[i].position.x + world->enemies[i].dimension.width >
+            world->enemies[0].position.x + world->enemies[0].dimension.width >
                 world->player.position.x &&
-            world->enemies[i].position.y < world->player.position.y +
+            world->enemies[0].position.y < world->player.position.y +
                                                world->player.dimension.height &&
-            world->enemies[i].position.y + world->enemies[i].dimension.height >
+            world->enemies[0].position.y + world->enemies[0].dimension.height >
                 world->player.position.y)
         {
             endScreen(0, world);
         }
+        }
     }
+    //move player laser
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         if (world->player.projectile[i].needs_update)
@@ -381,6 +384,7 @@ void update_player_position(World *world)
             }
         }
     }
+    //move enemy laser
     for (int index = 0; index < 10; index++)
     {
         int i = world->shooters[index];
@@ -408,6 +412,7 @@ void update_player_position(World *world)
         }
     }
 }
+//shoot projectile for enemy
 void enemy_shoot(World *world)
 {
 
@@ -441,11 +446,10 @@ int randAsteroidPosition()
     // Add 100 to the generated number to get a range from 100 to 900
     return randomNumber + 100;
 }
+//init bullet for entity
 void entity_shoot(Entity *entity, Direction direction)
 {
-    // if (clock() < entity->timer) return;
 
-    // entity->timer = clock() + CLOCKS_PER_SEC / 2;
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         if (!entity->projectile[i].active)
@@ -463,7 +467,7 @@ void entity_shoot(Entity *entity, Direction direction)
             else
             {
                 if (isStage2)
-                {
+                {// Initial a bullet from Boss
                     entity->projectile[i].position.x =
                         entity->position.x + (entity->dimension.width / 2);
                     entity->projectile[i].position.y =
@@ -472,7 +476,7 @@ void entity_shoot(Entity *entity, Direction direction)
                     entity->projectile[i].dimension.width = green_laser.width;
                 }
                 else
-                {
+                {// Initial asteroid
                     entity->projectile[i].position.x =
                         randAsteroidPosition();
                     entity->projectile[i].position.y =
@@ -489,6 +493,7 @@ void entity_shoot(Entity *entity, Direction direction)
         }
     }
 }
+//move enemy
 void update_AI_system(World *world)
 {
     /* vertical reset */
@@ -498,28 +503,15 @@ void update_AI_system(World *world)
     /* check wall collisions */
     for (int i = 0; i < 6; i++)
     {
-        if ((world->enemies[9].position.x +
-             world->enemies[9].dimension.width) >= (RIGHT_MAX))
+        if ((world->enemies[0].position.x +
+             world->enemies[0].dimension.width) >= (RIGHT_MAX))
         {
             travel_right = 0;
-            if (!enemies_at_bottom(world))
-            {
-                for (int j = 0; j < NUM_ENEMIES; j++)
-                {
-                    move_entity(&world->enemies[j], DOWN);
-                }
-            }
         }
         else if ((world->enemies[0].position.x) <= (LEFT_MAX))
         {
             travel_right = 1;
-            if (!enemies_at_bottom(world))
-            {
-                for (int j = 0; j < NUM_ENEMIES; j++)
-                {
-                    move_entity(&world->enemies[j], DOWN);
-                }
-            }
+
         }
     }
 
@@ -536,6 +528,7 @@ void update_AI_system(World *world)
         }
     }
 }
+//move projectile up or down
 void move_bullet(Missile *projectile, Direction direction)
 {
     switch (direction)
@@ -551,29 +544,9 @@ void move_bullet(Missile *projectile, Direction direction)
     }
 }
 
-void update_left_most(World *world, int index)
-{
-    for (int i = 0; i < 6; i++)
-    {
-        if (world->left_most_enemies[i] == index)
-        {
-            world->left_most_enemies[i] += 1;
-        }
-    }
-}
 
-void update_right_most(World *world, int index)
-{
-    for (int i = 0; i < 6; i++)
-    {
-        if (world->right_most_enemies[i] == index)
-        {
-            world->right_most_enemies[i] -= 1;
-        }
-    }
-}
-
-int intersectAABB(Missile *projectile, Entity *entity)
+//check intersect projectile and entity
+int intersectMtoE(Missile *projectile, Entity *entity)
 {
     return projectile->position.x <
                (entity->position.x + entity->dimension.width) &&
@@ -584,23 +557,24 @@ int intersectAABB(Missile *projectile, Entity *entity)
            (projectile->position.y + projectile->dimension.height) >
                entity->position.y;
 }
-
-int intersection(Missile *projectile, Missile *entity)
+//check intersect of 2 projectile 
+int intersectMtoM(Missile *projectile, Missile *projectile2)
 {
     return projectile->position.x <
-               (entity->position.x + entity->dimension.width) &&
+               (projectile2->position.x + projectile2->dimension.width) &&
            (projectile->position.x + projectile->dimension.width) >
-               entity->position.x &&
+               projectile2->position.x &&
            projectile->position.y <
-               (entity->position.y + entity->dimension.height) &&
+               (projectile2->position.y + projectile2->dimension.height) &&
            (projectile->position.y + projectile->dimension.height) >
-               entity->position.y;
+               projectile2->position.y;
 }
 
-void resolve_collisions(Missile *projectile, Entity *entity)
+//handle intersect projectile and entity
+void collisionsME(Missile *projectile, Entity *entity)
 {
     int isEnabled = entity->enabled;
-    int intersects = intersectAABB(projectile, entity);
+    int intersects = intersectMtoE(projectile, entity);
     if (isEnabled && intersects)
     {
         projectile->active = 0;
@@ -611,12 +585,13 @@ void resolve_collisions(Missile *projectile, Entity *entity)
     }
 }
 
-void resolve_collisions2(Missile *projectile, Missile *projectile2, World *world)
+//handle intersect of 2 projectile 
+void collisionsMM(Missile *projectile, Missile *projectile2, World *world)
 {
-    int intersects = intersection(projectile, projectile2);
+    int intersects = intersectMtoM(projectile, projectile2);
     if (intersects)
     {
-        drawExplosion2(projectile2);
+        drawExplosionBig(projectile2);
         wait_msec(1000);
         projectile->active = 0;
         projectile->needs_update = 0;
@@ -632,13 +607,13 @@ void resolve_collisions2(Missile *projectile, Missile *projectile2, World *world
     }
 }
 
-// Function to
+// Function to check collison constantly
 //----------------------------------------------------------------------------
 void update_collision_system(World *world)
 {
     Entity *player = &world->player;
     Entity *enemy = world->enemies;
-
+//check collision between player projectile and enemy projectile
     for (int i = 0; i < 10; i++)
     {
         int index = world->shooters[i];
@@ -646,38 +621,30 @@ void update_collision_system(World *world)
         {
             if (enemy[index].projectile[j].active)
             {
-                resolve_collisions(&enemy[index].projectile[j], player);
+                collisionsME(&enemy[index].projectile[j], player);
                 for (int a = 0; a < MAX_BULLETS; a++)
                 {
                     if (player->projectile[a].active)
                     {
-                        resolve_collisions2(&player->projectile[a], &enemy[index].projectile[j], world);
+                        collisionsMM(&player->projectile[a], &enemy[index].projectile[j], world);
                     }
                 }
             }
         }
+        //check collision between player projectile and Boss
         if (isStage2)
         {
             for (int a = 0; a < MAX_BULLETS; a++)
             {
                 if (player->projectile[a].active)
                 {
-                    resolve_collisions(&player->projectile[a], &enemy[0]);
+                    collisionsME(&player->projectile[a], &enemy[0]);
                 }
             }
         }
     }
 }
-void update_shooters(World *world, int index)
-{
-    for (int i = 0; i < MAX_SHOOTERS; i++)
-    {
-        if (world->shooters[i] == index)
-        {
-            world->shooters[i] += 10;
-        }
-    }
-}
+
 
 // Function to update the score and health from gameplay
 //----------------------------------------------------------------------------
@@ -705,7 +672,7 @@ void update_combat_system(World *world)
         }
     }
     if (world->playerScore.score >= 300)
-    {
+    {//spawn boss
         isStage2 = 1;
         if (isStage2 == 1 && check == 0)
         {render(world);
@@ -737,7 +704,7 @@ void update_combat_system(World *world)
     }
 
     if (isStage2)
-    {
+    {//boss lose health
         if (world->enemies[0].combat_update)
         {
             drawExplosion(world->enemies[0]);
@@ -754,21 +721,7 @@ void update_combat_system(World *world)
         }
     }
 }
-int enemies_at_bottom(World *world)
-{
-    int bottom_most = 0;
-    for (int i = 0; i < 10; i++)
-    {
-        if (world->enemies[bottom_most].position.y <
-            world->enemies[i].position.y)
-        {
-            bottom_most = world->shooters[i];
-        }
-    }
-    return (world->enemies[bottom_most].position.y +
-            world->enemies[bottom_most].dimension.height) >
-           ENEMIES_VERTICAL_MAX;
-}
+
 
 // Draw the enity using the data has set
 //----------------------------------------------------------------------------
@@ -856,7 +809,6 @@ void render(World *world)
     }
     else if (world->player.needs_clear)
     {
-        // drawExplosion2(world->player);
         drawExplosion(world->player);
         wait_msec(500);
         world->player.needs_clear = 0;
@@ -898,7 +850,7 @@ void drawScore(World *world, char *type)
     int tens = (world->playerScore.score % 100) / 10;
     int hundreds = (world->playerScore.score % 1000) / 100;
     int thousands = (world->playerScore.score % 10000) / 1000;
-
+//render score up to 4 decimal
     int score = world->playerScore.score;
     if (score >= 0 && score < 10)
     {
@@ -976,13 +928,7 @@ void render_health(World *world)
 //----------------------------------------------------------------------------
 void clear_health(int x, int y)
 {
-    // for (int h = 0; h < x; h++)
-    // {
-    //     for (int w = 0; w < y; w++)
-    //     {
-    //         drawPixelARGB32(w, h, 0);
-    //     }
-    // }
+
     drawString(x, y, " ", "black");
 }
 
@@ -1011,14 +957,14 @@ void render_score(int num, int x, int y)
     else if (num == 0)
         drawString(x, y, "0", "yellow");
 }
-
+//init player life
 void init_life(Entity *life)
 {
     life->health.player_health = 3;
     life->needs_update = 0;
     life->needs_render = 1;
 }
-
+//init player score
 void init_playerScore(Score *playerScore)
 {
     playerScore->score = 0;
@@ -1030,6 +976,8 @@ void update_score(World *world)
 {
 
     world->playerScore.score += 100;
+    //set cap
+    if (world->playerScore.score>9999) world->playerScore.score =9999;
      printf("Score: %d\n", world->playerScore.score);
 }
 
@@ -1040,8 +988,8 @@ void *memcpy(void *dest, const void *src, unsigned long n)
         ((char *)dest)[i] = ((char *)src)[i];
     }
 }
-
-void drawGameMenu(World *game)
+//draw the pause menu
+void drawPauseMenu(World *game)
 {
     int *colorptrMenu;
     int widthMenu = game_menu_pause.width;
@@ -1066,16 +1014,17 @@ void drawGameMenu(World *game)
         }
         if (colorptrMenu[i] != 0x00000000)
         {
-            // uart_hex(colorptrMenu[i]);
+            
             drawPixelARGB32(xMenu, yMenu, colorptrMenu[i]);
         }
         else
         {
             drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
         }
-        // drawPixel(xMenu, yMenu, colorptrMenu[i]);
+        
     }
 }
+//draw the main menu
 void drawMainMenu(Game *game)
 {
     int *colorptrMenu;
@@ -1108,7 +1057,7 @@ void drawMainMenu(Game *game)
         }
     }
 }
-
+//display end screen 
 void endScreen(int won, World *world)
 {
 
@@ -1120,13 +1069,14 @@ void endScreen(int won, World *world)
     displayGameUniverseBackground(0, 0);
 
     clearscreen(0, 0);
-
+//win
     if (won)
     {
         displayGameUniverseBackground(0, 0);
         drawScore(world, type);
         displayGameWinImage(300, 100);
     }
+    //lose
     else
     {
         displayGameUniverseBackground(0, 0);
@@ -1138,7 +1088,7 @@ void endScreen(int won, World *world)
     drawString(160, 320, "TO RESTART - R", "bright red");
     drawString(160, 390, "TO EXIT      - O", "bright green");
     drawString(50, 460, "------------------", "bright blue");
-    // Display message prompt user to exit game or continue playing
+    // Display message to tell player to quit game or continue playing
     while (!restartGame)
     {
         char character = uart_getc();
@@ -1156,12 +1106,10 @@ void endScreen(int won, World *world)
 
     return;
 }
-
+//draw explosion for entity
 void drawExplosion(Entity entity)
 {
-    // int x = entity.position.x;
-    // int oldX = x;
-    // int y = entity.position.y;
+
     int x = entity.position.x;
     int oldX = x;
     int y = entity.position.y;
@@ -1172,15 +1120,16 @@ void drawExplosion(Entity entity)
         displayExplosion(x, y);
     }
 }
-void drawExplosion2(Missile* entity)
+//draw exposion for missle
+void drawExplosionBig(Missile* projectile)
 {
-    int x = entity->position.x;
+    int x = projectile->position.x;
     int oldX = x;
-    int y = entity->position.y;
+    int y = projectile->position.y;
 
-    displayExplosion2(x, y);
+    displayExplosionBig(x, y);
 }
-
+//draw spaceship
 void drawSpaceShip(Entity entity, World *world)
 {
     int score = world->playerScore.score;
@@ -1197,7 +1146,7 @@ void drawSpaceShip(Entity entity, World *world)
         displaySpaceShipImage(x, y);
     }
 }
-
+//clear entity
 void clear(Entity entity)
 {
     int width = entity.dimension.width;

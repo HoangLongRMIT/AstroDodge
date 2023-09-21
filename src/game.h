@@ -8,9 +8,6 @@
 
 #define NUM_ENEMIES (12)
 
-#define NUM_BUNKERS 3
-#define BUNKER_HEALTH 10
-
 #define alien_initial_y 0
 #define alien_initial_x 200
 #define HORIZONTAL_OFFSET 61
@@ -147,8 +144,7 @@ void init_map(World *world);
 void init_player(Entity *player);
 void init_enemies(World *world);
 void init_life(Entity *life);
-void render(World *world);  // framebf.c
-// void move_player(World *world);
+void render(World *world);  
 void move_player(World *world);
 
 void update_player_position(World *world);
@@ -175,9 +171,9 @@ int rand(void);
 void update_AI_system(World *world);
 int enemies_at_bottom(World *world);
 void update_shooters(World *world, int index);
-void drawGameMenu(World *game);
+void drawPauseMenu(World *game);
 void drawMainMenu(Game *game);
-void show_game_menu(World *world);
+void pause_menu(World *world);
 void show_main_menu(Game *game) ;
 void drawScore(World *world,char *type);
 void init_playerScore(Score *playerScore);
@@ -185,7 +181,7 @@ void endScreen(int won, World *world) ;
 
 //-----------------------------------------------------
 void drawExplosion(Entity entity);
-void drawExplosion2(Missile* entity);
+void drawExplosionBig(Missile* projectile);
 
 void restart_game(Game *world);
 void drawSpaceShip(Entity entity, World *world);

@@ -208,7 +208,7 @@ void displayExplosion(int x, int y)
 }
 // Function to display the asteroid explosion
 //--------------------------------------------------------------------------
-void displayExplosion2(int x, int y)
+void displayExplosionBig(int x, int y)
 {
   for (int h = 0; h < explosion2_height; h++)
   {
