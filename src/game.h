@@ -3,7 +3,8 @@
 #include "mbox.h"
 #include "uart.h"
 
-
+#define BOSS_HEALTH 5
+#define NUM_PAWNS 20
 
 #define NUM_ENEMIES (12)
 
@@ -45,6 +46,8 @@ static int travel_right = 0;
 extern int quitGame;
 extern int restartGame;
 static int pauseGame;
+extern int isStage2;
+extern int check;
 static char str[50];
 typedef union {
     int current_health;
@@ -69,7 +72,7 @@ typedef struct {
     int needsRender;
 } Score;
 
-typedef enum { PLAYER = 1, ENEMIES=2} Type;
+typedef enum { PLAYER = 1,ENEMIES=2, BOSS=3} Type;
 
 typedef struct {
     Position position;
