@@ -182,8 +182,12 @@ void endScreen(int won, World *world) ;
 //-----------------------------------------------------
 void drawExplosion(Entity entity);
 void drawExplosionBig(Missile* projectile);
-
+int randAsteroidPosition();
 void restart_game(Game *world);
 void drawSpaceShip(Entity entity, World *world);
+int intersectMtoE(Missile *projectile, Entity *entity);
+int intersectMtoM(Missile *projectile, Missile *projectile2);
+void collisionsME(Missile *projectile, Entity *entity);
+void collisionsMM(Missile *projectile, Missile *projectile2, World *world);
 
 // void displaySpaceShipImage(int x, int y);
