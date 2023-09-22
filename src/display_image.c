@@ -11,8 +11,7 @@
 #include "life.h"
 #include "spaceship.h"
 #include "mbox.h"
-
-#include "game_universe_background_3.h"
+#include "game_universe_background.h"
 
 //=======================================================================================//
 //                    FUNCTION DISPLAY SMALL AND LARGE IMAGES                            //
@@ -245,7 +244,7 @@ void clearScore(unsigned int num, int x, int y)
       // Get the position y on the game background
       int imageY = (y + h) % 768;
       // Get the color of that portion of game background
-      int PixelColor = background_universe_image_3[imageX + imageY * 1024];
+      int PixelColor = background_universe_image[imageX + imageY * 1024];
       
       
       drawPixelARGB32(x + w, y + h, PixelColor);

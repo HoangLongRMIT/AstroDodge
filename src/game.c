@@ -7,7 +7,7 @@
 #include "display_image.h"
 #include "object.h"
 #include "printf.h"
-#include "game_universe_background_1.h"
+#include "game_universe_background.h"
 
 int wait_time_shoot = 100;
 
@@ -1040,7 +1040,7 @@ void drawPauseMenu(World *game)
         }
         else
         {
-            drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
+            drawPixelARGB32(xMenu, yMenu, background_universe_image[yMenu * universe_background_width + xMenu]);
         }
         
     }
@@ -1075,7 +1075,7 @@ void drawMainMenu(Game *game)
         }
         else
         {
-            drawPixelARGB32(xMenu, yMenu, background_universe_image_1[yMenu * universe_background_width_1 + xMenu]);
+            drawPixelARGB32(xMenu, yMenu, background_universe_image[yMenu * universe_background_width + xMenu]);
         }
     }
 }
@@ -1193,6 +1193,6 @@ void clear(Entity entity)
             y++;
             x = oldX;
         }
-        drawPixelARGB32(x, y, background_universe_image_1[y * universe_background_width_1 + x]);
+        drawPixelARGB32(x, y, background_universe_image[y * universe_background_width + x]);
     }
 }

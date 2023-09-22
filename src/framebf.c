@@ -10,7 +10,7 @@
 #include "display_image.h"
 #include "game.h"
 #include "object.h"
-#include "game_universe_background_2.h"
+#include "game_universe_background.h"
 // #include "terminal.h"
 
 
@@ -375,7 +375,7 @@ void clear_projectile(Position position, Dimension dimension) {
             y++;
             x = oldX;
         }
-        drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+        drawPixelARGB32(x, y, background_universe_image[y * universe_background_width + x]);
     }
 }
 // Function to draw projectile
@@ -413,7 +413,7 @@ void draw_projectile(Type type, Position position, Dimension dimension) {
             drawPixelARGB32(x, y, pixelColor);
         }
         else {
-            drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+            drawPixelARGB32(x, y, background_universe_image[y * universe_background_width + x]);
         }
         
     }
@@ -447,7 +447,7 @@ void drawEntity(Entity entity) {
             drawPixelARGB32(x, y, colorptr[i]);
         }
         else {
-            drawPixelARGB32(x, y, background_universe_image_2[y * universe_background_width_2 + x]);
+            drawPixelARGB32(x, y, background_universe_image[y * universe_background_width + x]);
         }
     }
 }
