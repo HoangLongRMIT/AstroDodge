@@ -986,7 +986,7 @@ void update_score(World *world)
 
     // Score per hit
     world->playerScore.score += 100;
-    world->playerScore.score += 30;
+    //world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
      printf("Score: %d\n", world->playerScore.score);
