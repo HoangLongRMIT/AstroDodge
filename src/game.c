@@ -28,9 +28,7 @@ void init_game(Game *world)
     init_map(&world->world);
     framebf_init();
 }
-
 // Create the stage
-//----------------------------------------------------------------------------
 void init_map(World *world)
 {
     init_player(&world->player);
@@ -126,9 +124,6 @@ void move_player(World *world)
         while (!pauseGame)
         {
             char character = uart_getc_game();
-            // if (character != '\n' && character != '\b')
-            // {
-            // }
             if (character == 'a')
             {
                 move_entity(&world->player, LEFT);
@@ -281,22 +276,20 @@ void move_entity(Entity *entity, Direction direction)
     case LEFT:
         entity->velocity.x =
             (entity->type == PLAYER) ? -PLAYER_SPEED : -HORIZONTAL_SPEED;
-        // entity->velocity.y = 0;
+       
         entity->needs_update = 1;
         break;
     case RIGHT:
         entity->velocity.x =
             (entity->type == PLAYER) ? PLAYER_SPEED : HORIZONTAL_SPEED;
-
         entity->needs_update = 1;
         break;
     case UP:
-        // entity->velocity.x = 0;
+      
         entity->velocity.y = -VERTICAL_SPEED;
         entity->needs_update = 1;
         break;
     case DOWN:
-        // entity->velocity.x = 0;
         entity->velocity.y = VERTICAL_SPEED;
         entity->needs_update = 1;
         break;
@@ -1001,7 +994,7 @@ void update_score(World *world)
 {
 
     // Score per hit
-    // world->playerScore.score += 100;
+    world->playerScore.score += 100;
     world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
