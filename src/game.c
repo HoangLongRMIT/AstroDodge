@@ -77,6 +77,7 @@ void init_player(Entity *player)
 }
 
 // Setting the value for enemies
+//----------------------------------------------------------------------------
 void init_enemies(World *world)
 {
     world->enemies[0].dimension.height = 0;
@@ -169,6 +170,7 @@ void move_player(World *world)
     }
 }
 //show main menu before game
+//----------------------------------------------------------------------------
 void show_main_menu(Game *game)
 {
 
@@ -544,6 +546,7 @@ void move_bullet(Missile *projectile, Direction direction)
 
 
 //check intersect projectile and entity
+//----------------------------------------------------------------------------
 int intersectMtoE(Missile *projectile, Entity *entity)
 {
     return projectile->position.x <
@@ -556,6 +559,7 @@ int intersectMtoE(Missile *projectile, Entity *entity)
                entity->position.y;
 }
 //check intersect of 2 projectile 
+//----------------------------------------------------------------------------
 int intersectMtoM(Missile *projectile, Missile *projectile2)
 {
     return projectile->position.x <
@@ -569,6 +573,7 @@ int intersectMtoM(Missile *projectile, Missile *projectile2)
 }
 
 //handle intersect projectile and entity
+//----------------------------------------------------------------------------
 void collisionsME(Missile *projectile, Entity *entity)
 {
     int isEnabled = entity->enabled;
@@ -584,6 +589,7 @@ void collisionsME(Missile *projectile, Entity *entity)
 }
 
 //handle intersect of 2 projectile 
+//----------------------------------------------------------------------------
 void collisionsMM(Missile *projectile, Missile *projectile2, World *world)
 {
     int intersects = intersectMtoM(projectile, projectile2);
@@ -956,13 +962,16 @@ void render_score(int num, int x, int y)
         drawString(x, y, "0", "yellow");
 }
 //init player life
+//----------------------------------------------------------------------------
 void init_life(Entity *life)
 {
     life->health.player_health = 3;
     life->needs_update = 0;
     life->needs_render = 1;
 }
+
 //init player score
+///----------------------------------------------------------------------------
 void init_playerScore(Score *playerScore)
 {
     playerScore->score = 0;
@@ -973,7 +982,9 @@ void init_playerScore(Score *playerScore)
 void update_score(World *world)
 {
 
+    // Score per hit
     world->playerScore.score += 100;
+    world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
      printf("Score: %d\n", world->playerScore.score);
@@ -987,6 +998,7 @@ void *memcpy(void *dest, const void *src, unsigned long n)
     }
 }
 //draw the pause menu
+//----------------------------------------------------------------------------
 void drawPauseMenu(World *game)
 {
     int *colorptrMenu;
@@ -1023,6 +1035,7 @@ void drawPauseMenu(World *game)
     }
 }
 //draw the main menu
+//----------------------------------------------------------------------------
 void drawMainMenu(Game *game)
 {
     int *colorptrMenu;
@@ -1055,7 +1068,9 @@ void drawMainMenu(Game *game)
         }
     }
 }
-//display end screen 
+
+//display end screen
+//---------------------------------------------------------------------------- 
 void endScreen(int won, World *world)
 {
 
@@ -1067,7 +1082,7 @@ void endScreen(int won, World *world)
     displayGameUniverseBackground(0, 0);
 
     clearscreen(0, 0);
-//win
+    //win
     if (won)
     {
         displayGameUniverseBackground(0, 0);
@@ -1083,8 +1098,9 @@ void endScreen(int won, World *world)
     }
     drawString(50, 180, "------------------", "yellow");
     drawString(285, 250, "PRESS KEY", "bright magenta");
-    drawString(160, 320, "TO RESTART - R", "bright red");
-    drawString(160, 390, "TO EXIT      - O", "bright green");
+    // drawString(160, 320, "TO RESTART - R", "bright red");
+    drawString(200, 320, "R-TO RESTART", "bright red");
+    drawString(200, 390, "0-TO EXIT", "bright green");
     drawString(50, 460, "------------------", "bright blue");
     // Display message to tell player to quit game or continue playing
     while (!restartGame)
@@ -1105,6 +1121,7 @@ void endScreen(int won, World *world)
     return;
 }
 //draw explosion for entity
+//----------------------------------------------------------------------------
 void drawExplosion(Entity entity)
 {
 
@@ -1119,6 +1136,7 @@ void drawExplosion(Entity entity)
     }
 }
 //draw exposion for missle
+//----------------------------------------------------------------------------
 void drawExplosionBig(Missile* projectile)
 {
     int x = projectile->position.x;
@@ -1128,6 +1146,7 @@ void drawExplosionBig(Missile* projectile)
     displayExplosionBig(x, y);
 }
 //draw spaceship
+//----------------------------------------------------------------------------
 void drawSpaceShip(Entity entity, World *world)
 {
     int score = world->playerScore.score;
@@ -1145,6 +1164,7 @@ void drawSpaceShip(Entity entity, World *world)
     }
 }
 //clear entity
+//----------------------------------------------------------------------------
 void clear(Entity entity)
 {
     int width = entity.dimension.width;
