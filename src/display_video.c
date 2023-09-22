@@ -5,6 +5,7 @@
 //                            FUNCTION DISPLAY VIDEO                                     //
 //=======================================================================================//
 // Function of Delay Interrupt in one second
+//-----------------------------------------------------------
 void wait_ms(unsigned int n) {
     register unsigned long f, t, r;
 
@@ -20,6 +21,7 @@ void wait_ms(unsigned int n) {
 }
 
 // Function to display video
+//-----------------------------------------------------------
 void displayVideo(int x, int y) {
     // Add message to notify the user how to use
     uart_puts("Video is playing ...\n");
