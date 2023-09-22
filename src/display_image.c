@@ -168,9 +168,7 @@ void displayScore(int x, int y)
   {
     for (int w = 0; w < word_score_width; w++)
     {
-      // drawPixelARGB32(x + w, y + h, word_score_image[h * word_score_width + w]);
-
-      // unsigned char mask = 1 << j;
+      
       unsigned long mask = 0xffff;
 
       unsigned char *glyph = (unsigned char *)&word_score_image[h * word_score_width + w];
@@ -227,13 +225,6 @@ void displayExplosionBig(int x, int y)
 //--------------------------------------------------------------------------
 void clearScore(unsigned int num, int x, int y)
 {
-  // for (int h = 0; h < 50; h++)
-  // {
-  //   for (int w = 0; w < 50; w++)
-  //   {
-  //     drawPixelARGB32(x + w, y + h, 0);
-  //   }
-  // }
 
    for (int h = 0; h < 50; h++)
   {
@@ -250,9 +241,7 @@ void clearScore(unsigned int num, int x, int y)
       drawPixelARGB32(x + w, y + h, PixelColor);
     }
   }
-  // char ch = num;
 
-  // drawChar(ch, x, y, '2');
 }
 // Function to clear lives
 //--------------------------------------------------------------------------
@@ -279,9 +268,6 @@ void displayWordPlayerLife(int x, int y)
   {
     for (int w = 0; w < word_lives_width; w++)
     {
-      // drawPixelARGB32(x + w, y + h, word_lives_image[h * word_lives_width + w]);
-
-      // unsigned char mask = 1 << j;
       unsigned long mask = 0xffff;
 
       unsigned char *glyph = (unsigned char *)&word_lives_image[h * word_lives_width + w];
