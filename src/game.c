@@ -89,18 +89,16 @@ void init_enemies(World *world)
     world->enemies[0].dimension.height = 0;
     world->enemies[0].dimension.width = 0;
     world->enemies[0].type = 0;
-    for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
+    
+    world->enemies[0].needs_render = 0;
+    world->enemies[0].needs_update = 1;
+    world->enemies[0].enabled = 1;
+    world->enemies[0].health.current_health = 1;
+    world->enemies[0].combat_update = 0;
+    for (int j = 0; j < MAX_BULLETS; j++)
     {
-        world->enemies[i].needs_render = 0;
-        world->enemies[i].needs_update = 1;
-        world->enemies[i].enabled = 1;
-        world->enemies[i].health.current_health = 1;
-        world->enemies[i].combat_update = 0;
-        for (int j = 0; j < MAX_BULLETS; j++)
-        {
-            world->enemies[i].projectile[j].active = 0;
-            world->enemies[i].projectile[j].position.y = 1000;
-        }
+        world->enemies[0].projectile[j].active = 0;
+        world->enemies[0].projectile[j].position.y = 1000;
     }
 
     for (int i = 0; i < MAX_SHOOTERS; i++)
