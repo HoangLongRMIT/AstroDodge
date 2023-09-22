@@ -7,7 +7,7 @@ OFILES = $(CFILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 GCCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib
 LDFLAGS = -nostdlib 
-all: clean kernel8.img run
+all: clean kernel8.img music run
 
 $(BUILD_DIR)/boot.o: $(SRC_DIR)/boot.S
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
@@ -25,3 +25,8 @@ clean:
 #raspi3b for mac and raspi3 for window
 run:
 	qemu-system-aarch64 -M raspi3 -kernel kernel8.img -serial null -serial stdio
+
+music:
+	cmd /C start boss_music.mp3
+
+test: all run

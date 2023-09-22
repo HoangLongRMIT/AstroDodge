@@ -10,7 +10,9 @@
 #include "game_universe_background_1.h"
 
 int wait_time_shoot = 100;
+
 //initalize the game
+//----------------------------------------------------------------------------
 void init_game(Game *world)
 {
     world->game_over = 0;
@@ -26,7 +28,9 @@ void init_game(Game *world)
     init_map(&world->world);
     framebf_init();
 }
+
 // Create the stage
+//----------------------------------------------------------------------------
 void init_map(World *world)
 {
     init_player(&world->player);
@@ -38,7 +42,9 @@ void init_map(World *world)
     world->game_menu.on_gameMenu_menu = 0;
     world->game_over = 0;
 }
+
 //restart the game
+//----------------------------------------------------------------------------
 void restart_game(Game *world)
 {
     clearscreen(0, 0);
@@ -55,7 +61,9 @@ void restart_game(Game *world)
     pauseGame = 0;
     quitGame = 0;
 }
+
 // Setting the value for player
+//----------------------------------------------------------------------------
 void init_player(Entity *player)
 {
     player->dimension.height = 90;
@@ -104,6 +112,7 @@ void init_enemies(World *world)
 }
 
 // Move player
+//----------------------------------------------------------------------------
 void move_player(World *world)
 {
     uart_puts("Press A to move left: \n");
@@ -205,7 +214,8 @@ void show_main_menu(Game *game)
         }
     }
 }
-//display pause menu
+// display pause menu
+//----------------------------------------------------------------------------
 void pause_menu(World *world)
 {
     world->game_menu.game_menu_option = 1;
@@ -262,7 +272,8 @@ void pause_menu(World *world)
     }
     return;
 }
-//move player and enemy
+// move player and enemy
+//----------------------------------------------------------------------------
 void move_entity(Entity *entity, Direction direction)
 {
     switch (direction)
@@ -304,8 +315,8 @@ void move_entity(Entity *entity, Direction direction)
     }
 }
 
-//----------------------------------------------------------------------------
 //track player position and their collision
+//----------------------------------------------------------------------------
 void update_player_position(World *world)
 {
     if (world->player.needs_update)
@@ -414,7 +425,8 @@ void update_player_position(World *world)
         }
     }
 }
-//shoot projectile for enemy
+// shoot projectile for enemy
+//----------------------------------------------------------------------------
 void enemy_shoot(World *world)
 {
 
@@ -448,7 +460,9 @@ int randAsteroidPosition()
     // Add 100 to the generated number to get a range from 100 to 900
     return randomNumber + 100;
 }
-//init bullet for entity
+
+// init bullet for entity
+//----------------------------------------------------------------------------
 void entity_shoot(Entity *entity, Direction direction)
 {
 
@@ -495,7 +509,8 @@ void entity_shoot(Entity *entity, Direction direction)
         }
     }
 }
-//move enemy
+// move enemy
+//----------------------------------------------------------------------------
 void update_AI_system(World *world)
 {
     /* vertical reset */
@@ -530,7 +545,8 @@ void update_AI_system(World *world)
         }
     }
 }
-//move projectile up or down
+// move projectile up or down
+//----------------------------------------------------------------------------
 void move_bullet(Missile *projectile, Direction direction)
 {
     switch (direction)
@@ -547,7 +563,7 @@ void move_bullet(Missile *projectile, Direction direction)
 }
 
 
-//check intersect projectile and entity
+// check intersect projectile and entity
 //----------------------------------------------------------------------------
 int intersectMtoE(Missile *projectile, Entity *entity)
 {
@@ -985,7 +1001,7 @@ void update_score(World *world)
 {
 
     // Score per hit
-    world->playerScore.score += 100;
+    // world->playerScore.score += 100;
     world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
