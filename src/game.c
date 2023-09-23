@@ -239,10 +239,10 @@ void pause_menu(World *world)
         else if (character == ' ') // space to select
         {
             if (world->game_menu.game_menu_option == 2)
-            {
+            {//resume game
                 world->game_menu.on_gameMenu_menu = 0;
                 displayGameUniverseBackground(0, 0);
-                printf("\nSELECT: Pause");
+                printf("\nSELECT: Resume");
                 world->life.needs_render = 1;
                 world->playerScore.needsRender = 1;
                 world->player.needs_render = 1;
@@ -1082,7 +1082,7 @@ void endScreen(int won, World *world)
 
     pauseGame = 1;
     uart_puts("\n\n");
-    uart_puts("Press o to out: \n");
+    uart_puts("Press e to exit: \n");
     uart_puts("Press r to restart: \n");
     char *type = "d";
     displayGameUniverseBackground(0, 0);
@@ -1105,13 +1105,13 @@ void endScreen(int won, World *world)
     drawString(50, 180, "------------------", "yellow");
     drawString(285, 250, "PRESS KEY", "bright magenta");
     drawString(200, 320, "R-TO RESTART", "bright red");
-    drawString(200, 390, "0-TO EXIT", "bright green");
+    drawString(200, 390, "E-TO EXIT", "bright green");
     drawString(50, 460, "------------------", "bright blue");
     // Display message to tell player to quit game or continue playing
     while (!restartGame)
     {
         char character = uart_getc();
-        if (character == 'o')
+        if (character == 'e')
         {
             quitGame = 1;
             uart_puts("\n\nSuccessfully out!\n");
