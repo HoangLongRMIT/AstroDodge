@@ -153,10 +153,10 @@ void move_game(World *world)
                 pause_menu(world);
             }
             //run functions to update all values before render the result
-            update_AI_system(world);
-            update_collision_system(world);
-            update_combat_system(world);
-            update_player_position(world);
+            update_AI(world);
+            update_collision(world);
+            update_combat(world);
+            update_position(world);
             render(world);
             //shoot per 10 count of wait_time_shoot;
             if (wait_time_shoot % 10 == 0 && wait_time_shoot != 100)
@@ -307,10 +307,10 @@ void move_entity(Entity *entity, Direction direction)
     }
 }
 
-//track player position and their collision
+//track all position and if boss and player collide
 //----------------------------------------------------------------------------
-void update_player_position(World *world)
-{
+void update_position(World *world)
+{//move player
     if (world->player.needs_update)
     {
         world->player.previous_pos = world->player.position;
@@ -503,7 +503,7 @@ void entity_shoot(Entity *entity, Direction direction)
 }
 // move enemy
 //----------------------------------------------------------------------------
-void update_AI_system(World *world)
+void update_AI(World *world)
 {
     /* check wall collisions */
     
@@ -534,7 +534,7 @@ void update_AI_system(World *world)
 }
 // move projectile up or down
 //----------------------------------------------------------------------------
-void move_bullet(Missile *projectile, Direction direction)
+void move_bullet(Projectile *projectile, Direction direction)
 {
     switch (direction)
     {
@@ -552,7 +552,7 @@ void move_bullet(Missile *projectile, Direction direction)
 
 // check intersect projectile and entity
 //----------------------------------------------------------------------------
-int intersectMtoE(Missile *projectile, Entity *entity)
+int intersectMtoE(Projectile *projectile, Entity *entity)
 {
     return projectile->position.x <
                (entity->position.x + entity->dimension.width) &&
@@ -565,7 +565,7 @@ int intersectMtoE(Missile *projectile, Entity *entity)
 }
 //check intersect of 2 projectile 
 //----------------------------------------------------------------------------
-int intersectMtoM(Missile *projectile, Missile *projectile2)
+int intersectMtoM(Projectile *projectile, Projectile *projectile2)
 {
     return projectile->position.x <
                (projectile2->position.x + projectile2->dimension.width) &&
@@ -579,8 +579,8 @@ int intersectMtoM(Missile *projectile, Missile *projectile2)
 
 //handle intersect projectile and entity
 //----------------------------------------------------------------------------
-void collisionsME(Missile *projectile, Entity *entity)
-{//if both missile and entity is active and they intersect then update value
+void collisionsME(Projectile *projectile, Entity *entity)
+{//if both projectile and entity is active and they intersect then update value
     int isEnabled = entity->enabled;
     int intersects = intersectMtoE(projectile, entity);
     if (isEnabled && intersects)
@@ -595,8 +595,8 @@ void collisionsME(Missile *projectile, Entity *entity)
 
 //handle intersect of 2 projectile 
 //----------------------------------------------------------------------------
-void collisionsMM(Missile *projectile, Missile *projectile2, World *world)
-{//if both missle intersect then update value
+void collisionsMM(Projectile *projectile, Projectile *projectile2, World *world)
+{//if both projectile intersect then update value
     int intersects = intersectMtoM(projectile, projectile2);
     if (intersects)
     {//explode, clear both projectile and update score
@@ -618,7 +618,7 @@ void collisionsMM(Missile *projectile, Missile *projectile2, World *world)
 
 // Function to check collison constantly
 //----------------------------------------------------------------------------
-void update_collision_system(World *world)
+void update_collision(World *world)
 {
     Entity *player = &world->player;
     Entity *enemy = world->enemies;
@@ -657,7 +657,7 @@ void update_collision_system(World *world)
 
 // Function to update the score and health from gameplay
 //----------------------------------------------------------------------------
-void update_combat_system(World *world)
+void update_combat(World *world)
 {//player lose health
     if (world->player.combat_update)
     {
@@ -732,7 +732,7 @@ void update_combat_system(World *world)
 }
 
 
-// Draw the etity using the data has set
+// Draw the entity using the data has set
 //----------------------------------------------------------------------------
 void render(World *world)
 {
@@ -1140,9 +1140,9 @@ void drawExplosion(Entity entity)
         displayExplosion(x, y);
     }
 }
-//draw exposion for missle
+//draw exposion for projectile
 //----------------------------------------------------------------------------
-void drawExplosionBig(Missile* projectile)
+void drawExplosionBig(Projectile* projectile)
 {
     int x = projectile->position.x;
     int oldX = x;

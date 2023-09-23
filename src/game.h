@@ -80,14 +80,14 @@ typedef struct {
     int needs_render;
     int needs_clear;
     int active;
-} Missile;
+} Projectile;
 /* ship, shooter */
 typedef struct {
     Velocity velocity;
     Dimension dimension;
     Position position;
     Position previous_pos;
-    Missile projectile[MAX_BULLETS];
+    Projectile projectile[MAX_BULLETS];
     Type type;
     Health health;
     int needs_update;
@@ -147,13 +147,13 @@ void init_life(Entity *life);
 void render(World *world);  
 void move_game(World *world);
 
-void update_player_position(World *world);
+void update_position(World *world);
 void move_entity(Entity *entity, Direction direction);
 void drawEntity(Entity entity);
 
 void entity_shoot(Entity *entity, Direction direction);
-Missile *create_bullet(Entity owner);
-void move_bullet(Missile *projectile, Direction direction);
+Projectile *create_bullet(Entity owner);
+void move_bullet(Projectile *projectile, Direction direction);
 void *memcpy(void *dest, const void *src, unsigned long n);
 void draw_projectile(Type type, Position position, Dimension dimension);
 void clear_projectile(Position position, Dimension dimension);
@@ -161,14 +161,14 @@ void render_health(World *world);
 
 void render_score(int num,int x, int y);
 
-void update_combat_system(World *world);
-void update_collision_system(World *world);
+void update_combat(World *world);
+void update_collision(World *world);
 void clear(Entity entity);
 void update_score(World *world);
 void enemy_shoot(World *world);
 int rand(void);
 
-void update_AI_system(World *world);
+void update_AI(World *world);
 int enemies_at_bottom(World *world);
 void update_shooters(World *world, int index);
 void drawPauseMenu(World *game);
@@ -181,13 +181,13 @@ void endScreen(int won, World *world) ;
 
 //-----------------------------------------------------
 void drawExplosion(Entity entity);
-void drawExplosionBig(Missile* projectile);
+void drawExplosionBig(Projectile* projectile);
 int randAsteroidPosition();
 void restart_game(Game *world);
 void drawSpaceShip(Entity entity, World *world);
-int intersectMtoE(Missile *projectile, Entity *entity);
-int intersectMtoM(Missile *projectile, Missile *projectile2);
-void collisionsME(Missile *projectile, Entity *entity);
-void collisionsMM(Missile *projectile, Missile *projectile2, World *world);
+int intersectMtoE(Projectile *projectile, Entity *entity);
+int intersectMtoM(Projectile *projectile, Projectile *projectile2);
+void collisionsME(Projectile *projectile, Entity *entity);
+void collisionsMM(Projectile *projectile, Projectile *projectile2, World *world);
 
 // void displaySpaceShipImage(int x, int y);
