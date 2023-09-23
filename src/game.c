@@ -107,9 +107,9 @@ void init_enemies(World *world)
     }
 }
 
-// Move player
+// Move the game forward
 //----------------------------------------------------------------------------
-void move_player(World *world)
+void move_game(World *world)
 {
     uart_puts("Press A to move left: \n");
     uart_puts("Press D to move right: \n");
@@ -120,7 +120,7 @@ void move_player(World *world)
     while (!quitGame && !restartGame)
     {
         while (!pauseGame)
-        {
+        {//code to move player
             char character = uart_getc_game();
             if (character == 'a')
             {//move left

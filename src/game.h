@@ -145,7 +145,7 @@ void init_player(Entity *player);
 void init_enemies(World *world);
 void init_life(Entity *life);
 void render(World *world);  
-void move_player(World *world);
+void move_game(World *world);
 
 void update_player_position(World *world);
 void move_entity(Entity *entity, Direction direction);

@@ -203,7 +203,7 @@ void cli()
 						displayGameUniverseBackground(0, 0);
 
 						restart_game(&game);
-						move_player(&game.world);
+						move_game(&game.world);
 					}
 				}
 				clearscreen(0, 0);
