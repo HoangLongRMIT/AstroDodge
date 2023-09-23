@@ -76,32 +76,3 @@ int mbox_call(unsigned int buffer_addr, unsigned char channel)
     }
     return 0;
 }
-
-// void mbox_buffer_setup(unsigned int buffer_addr, unsigned int tag_identifier, unsigned int **res_data, unsigned int req_length, unsigned int res_length, ...)
-// {
-//     va_list variable_args;
-//     va_start(variable_args, res_length); // Start va_list with the last known parameter
-
-//     unsigned int *buffer_ptr = (unsigned int *)buffer_addr;
-//     const unsigned int msg_size = 8 * 4;
-
-//     buffer_ptr[0] = msg_size;     // Message Buffer Size in bytes (8 elements * 4 bytes each)
-//     buffer_ptr[1] = MBOX_REQUEST; // Message Request Code (this is a request message)
-//     buffer_ptr[2] = tag_identifier;
-//     buffer_ptr[3] = (req_length >= res_length) ? req_length : res_length; // Value buffer size
-
-//     for (int i = 0; i < 4; i++)
-//     {
-//         buffer_ptr[i + 4] = (i == 0) ? 0 : va_arg(variable_args, unsigned int); // Set buffer elements
-//     }
-//     buffer_ptr[7] = MBOX_TAG_LAST;
-
-//     for (int i = 0; i < req_length / 4; i++)
-//     {
-//         buffer_ptr[i + 8] = va_arg(variable_args, unsigned int); // Set the remaining buffer elements
-//     }
-
-//     va_end(variable_args);
-
-//     *res_data = &buffer_ptr[5];
-// }
