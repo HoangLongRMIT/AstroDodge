@@ -35,7 +35,6 @@ void init_map(World *world)
     init_enemies(world);
     init_playerScore(&world->playerScore);
     init_life(&world->life);
-    world->enemies_alive = NUM_ENEMIES;
     world->game_menu.game_menu_option = 0;
     world->game_menu.on_gameMenu_menu = 0;
     world->game_over = 0;
@@ -86,24 +85,19 @@ void init_player(Entity *player)
 //----------------------------------------------------------------------------
 void init_enemies(World *world)
 {
-    world->enemies[0].dimension.height = 0;
-    world->enemies[0].dimension.width = 0;
-    world->enemies[0].type = 0;
+    world->enemies.dimension.height = 0;
+    world->enemies.dimension.width = 0;
+    world->enemies.type = 0;
     
-    world->enemies[0].needs_render = 0;
-    world->enemies[0].needs_update = 1;
-    world->enemies[0].enabled = 1;
-    world->enemies[0].health.current_health = 1;
-    world->enemies[0].combat_update = 0;
+    world->enemies.needs_render = 0;
+    world->enemies.needs_update = 1;
+    world->enemies.enabled = 1;
+    world->enemies.health.current_health = 1;
+    world->enemies.combat_update = 0;
     for (int j = 0; j < MAX_BULLETS; j++)
     {
-        world->enemies[0].projectile[j].active = 0;
-        world->enemies[0].projectile[j].position.y = 1000;
-    }
-
-    for (int i = 0; i < MAX_SHOOTERS; i++)
-    {
-        world->shooters[i] = i;
+        world->enemies.projectile[j].active = 0;
+        world->enemies.projectile[j].position.y = 1000;
     }
 }
 
@@ -342,28 +336,26 @@ void update_position(World *world)
         world->player.needs_update = 0;
     }
 
-    for (int i = 0; i < NUM_ENEMIES; i++)
-    {//move enemy
-        if (world->enemies[i].needs_update)
-        {
-            world->enemies[i].previous_pos = world->enemies[i].position;
-            world->enemies[i].position.x += world->enemies[i].velocity.x;
-            world->enemies[i].needs_render = 1;
-            world->enemies[i].needs_update = 0;
-        }
-        if (isStage2){
+    //move enemy
+    if (world->enemies.needs_update)
+    {
+        world->enemies.previous_pos = world->enemies.position;
+        world->enemies.position.x += world->enemies.velocity.x;
+        world->enemies.needs_render = 1;
+        world->enemies.needs_update = 0;
+    }
+    if (isStage2){
         // Check if boss hit player then end game over
-        if (world->enemies[0].position.x < world->player.position.x +
-                                               world->player.dimension.width &&
-            world->enemies[0].position.x + world->enemies[0].dimension.width >
+        if (world->enemies.position.x < world->player.position.x +
+                                            world->player.dimension.width &&
+            world->enemies.position.x + world->enemies.dimension.width >
                 world->player.position.x &&
-            world->enemies[0].position.y < world->player.position.y +
-                                               world->player.dimension.height &&
-            world->enemies[0].position.y + world->enemies[0].dimension.height >
+            world->enemies.position.y < world->player.position.y +
+                                            world->player.dimension.height &&
+            world->enemies.position.y + world->enemies.dimension.height >
                 world->player.position.y)
         {
             endScreen(0, world);
-        }
         }
     }
     //move player laser
@@ -390,29 +382,25 @@ void update_position(World *world)
         }
     }
     //move enemy laser
-    for (int index = 0; index < 10; index++)
-    {
-        int i = world->shooters[index];
-        for (int j = 0; j < MAX_BULLETS; j++)
+    for (int j = 0; j < MAX_BULLETS; j++)
         {//if not reach bottom then move
-            if (world->enemies[i].projectile[j].needs_update)
+        if (world->enemies.projectile[j].needs_update)
+        {
+            if (world->enemies.projectile[j].position.y < BOTTOM_MAX)
             {
-                if (world->enemies[i].projectile[j].position.y < BOTTOM_MAX)
-                {
-                    world->enemies[i].projectile[j].previous_pos =
-                        world->enemies[i].projectile[j].position;
-                    world->enemies[i].projectile[j].position.x +=
-                        world->enemies[i].projectile[j].velocity.x;
-                    world->enemies[i].projectile[j].position.y +=
-                        world->enemies[i].projectile[j].velocity.y;
-                    world->enemies[i].projectile[j].needs_render = 1;
-                }
-                else
-                {
-                    world->enemies[i].projectile[j].needs_render = 0;
-                    world->enemies[i].projectile[j].active = 0;
-                    world->enemies[i].projectile[j].needs_clear = 1;
-                }
+                world->enemies.projectile[j].previous_pos =
+                    world->enemies.projectile[j].position;
+                world->enemies.projectile[j].position.x +=
+                    world->enemies.projectile[j].velocity.x;
+                world->enemies.projectile[j].position.y +=
+                    world->enemies.projectile[j].velocity.y;
+                world->enemies.projectile[j].needs_render = 1;
+            }
+            else
+            {
+                world->enemies.projectile[j].needs_render = 0;
+                world->enemies.projectile[j].active = 0;
+                world->enemies.projectile[j].needs_clear = 1;
             }
         }
     }
@@ -425,11 +413,11 @@ void enemy_shoot(World *world)
     int random = (rand() % 100) % 10;
     if (isStage2)
     {//boss shoot
-        entity_shoot(&world->enemies[world->shooters[0]], DOWN);
+        entity_shoot(&world->enemies, DOWN);
     }
     else
     {//random shot meteor
-        entity_shoot(&world->enemies[world->shooters[random]], DOWN);
+        entity_shoot(&world->enemies, DOWN);
     }
 }
 
@@ -507,29 +495,24 @@ void update_AI(World *world)
 {
     /* check wall collisions */
     
-        if ((world->enemies[0].position.x +
-             world->enemies[0].dimension.width) >= (RIGHT_MAX))
-        {
-            travel_right = 0;
-        }
-        else if ((world->enemies[0].position.x) <= (LEFT_MAX))
-        {
-            travel_right = 1;
-
-        }
-    
-
-    /* move enemies right or left */
-    for (int i = 0; i < NUM_ENEMIES; i++)
+    if ((world->enemies.position.x +
+            world->enemies.dimension.width) >= (RIGHT_MAX))
     {
-        if (travel_right)
-        {
-            move_entity(&world->enemies[i], RIGHT);
-        }
-        else
-        {
-            move_entity(&world->enemies[i], LEFT);
-        }
+        travel_right = 0;
+    }
+    else if ((world->enemies.position.x) <= (LEFT_MAX))
+    {
+        travel_right = 1;
+
+    }
+    
+    if (travel_right)
+    {
+        move_entity(&world->enemies, RIGHT);
+    }
+    else
+    {
+        move_entity(&world->enemies, LEFT);
     }
 }
 // move projectile up or down
@@ -621,21 +604,18 @@ void collisionsPP(Projectile *projectile, Projectile *projectile2, World *world)
 void update_collision(World *world)
 {
     Entity *player = &world->player;
-    Entity *enemy = world->enemies;
+    Entity *enemy = &world->enemies;
 //check collision of player projectile and enemy projectile
-    for (int i = 0; i < 10; i++)
-    {
-        int index = world->shooters[i];
-        for (int j = 0; j < MAX_BULLETS; j++)
+    for (int j = 0; j < MAX_BULLETS; j++)
         {
-            if (enemy[index].projectile[j].active)
+            if (enemy->projectile[j].active)
             {//check if enemy projectile collide with player
-                collisionsPE(&enemy[index].projectile[j], player);
+                collisionsPE(&enemy->projectile[j], player);
                 for (int a = 0; a < MAX_BULLETS; a++)
                 {
                     if (player->projectile[a].active)
                     {// check player and enemy projectile collide
-                        collisionsPP(&player->projectile[a], &enemy[index].projectile[j], world);
+                        collisionsPP(&player->projectile[a], &enemy->projectile[j], world);
                     }
                 }
             }
@@ -647,11 +627,10 @@ void update_collision(World *world)
             {
                 if (player->projectile[a].active)
                 {
-                    collisionsPE(&player->projectile[a], &enemy[0]);
+                    collisionsPE(&player->projectile[a], enemy);
                 }
             }
         }
-    }
 }
 
 
@@ -685,48 +664,45 @@ void update_combat(World *world)
         isStage2 = 1;
         if (isStage2 == 1 && check == 0)
         {render(world);
-            for (int i = 0, j = 0; i < NUM_ENEMIES; i++)
-            {
-                for (int j = 0; j < MAX_BULLETS; j++)
-                { clear_projectile(
-                    world->enemies[i].projectile[j].previous_pos,
-                    world->enemies[i].projectile[j].dimension);
-                    clear_projectile(
-                    world->enemies[i].projectile[j].position,
-                    world->enemies[i].projectile[j].dimension);
-                    world->enemies[i].projectile[j].active = 0;
-                    world->enemies[i].projectile[j].position.y = 1000;
-                }
+            for (int j = 0; j < MAX_BULLETS; j++)
+            { clear_projectile(
+                world->enemies.projectile[j].previous_pos,
+                world->enemies.projectile[j].dimension);
+                clear_projectile(
+                world->enemies.projectile[j].position,
+                world->enemies.projectile[j].dimension);
+                world->enemies.projectile[j].active = 0;
+                world->enemies.projectile[j].position.y = 1000;
             }
 
             check = 1;
-            world->enemies[0].position.x =
+            world->enemies.position.x =
                 enemy_initial_x + (HORIZONTAL_OFFSET * 0);
-            world->enemies[0].position.y =
+            world->enemies.position.y =
                 enemy_initial_y + 50;
 
-            world->enemies[0].dimension.height = boss_image.height;
-            world->enemies[0].dimension.width = boss_image.width;
-            world->enemies[0].health.current_health = BOSS_HEALTH;
-            world->enemies[0].type = BOSS;
+            world->enemies.dimension.height = boss_image.height;
+            world->enemies.dimension.width = boss_image.width;
+            world->enemies.health.current_health = BOSS_HEALTH;
+            world->enemies.type = BOSS;
         }
     }
 
     if (isStage2)
     {//boss lose health
-        if (world->enemies[0].combat_update)
+        if (world->enemies.combat_update)
         {
-            drawExplosion(world->enemies[0]);
-            world->enemies[0].health.current_health -= 1;
-             printf("Boss health: %d\n", world->enemies[0].health.current_health);
-            if (world->enemies[0].health.current_health <= 0)
+            drawExplosion(world->enemies);
+            world->enemies.health.current_health -= 1;
+             printf("Boss health: %d\n", world->enemies.health.current_health);
+            if (world->enemies.health.current_health <= 0)
             {//clear boss and end game when boss die
-                world->enemies[0].enabled = 0;
-                world->enemies[0].needs_clear = 1;
+                world->enemies.enabled = 0;
+                world->enemies.needs_clear = 1;
                 wait_msec(500);
                 endScreen(1, world);
             }
-            world->enemies[0].combat_update = 0;
+            world->enemies.combat_update = 0;
         }
     }
 }
@@ -741,7 +717,7 @@ void render(World *world)
         return;
     }
     wait_msec(30000);
-//render player bullet
+    //render player bullet
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         Type type = world->player.type;
@@ -760,53 +736,46 @@ void render(World *world)
             world->player.projectile[i].needs_clear = 0;
         }
     }
-//render enemy
-    for (int i = 0; i < NUM_ENEMIES; i++)
+    //render enemy
+    if (world->enemies.needs_render && world->enemies.enabled)
     {
-        if (world->enemies[i].needs_render && world->enemies[i].enabled)
-        {
-            clear(world->enemies[i]);
-            drawEntity(world->enemies[i]);
+        clear(world->enemies);
+        drawEntity(world->enemies);
 
-            world->enemies[i].needs_render = 1; // 0 default
-        }
-        else if (world->enemies[i].needs_clear)
-        {
-            clear(world->enemies[i]);
-            // fix bug bullet not clear
-            for (int j = 0; j < MAX_BULLETS; j++)
-            {
-                clear_projectile(world->enemies[i].projectile[j].position,
-                                 world->enemies[i].projectile[j].dimension);
-            }
-
-            drawSpaceShip(world->player, world);
-            world->enemies[i].needs_clear = 0;
-        }
+        world->enemies.needs_render = 1; // 0 default
     }
-//render enemy bullet
-    for (int i = 0; i < MAX_SHOOTERS; i++)
+    else if (world->enemies.needs_clear)
     {
+        clear(world->enemies);
+        // fix bug bullet not clear
         for (int j = 0; j < MAX_BULLETS; j++)
         {
-            int index = world->shooters[i];
-            Type type = world->enemies[index].type;
-            if (world->enemies[index].projectile[j].needs_render)
-            {
+            clear_projectile(world->enemies.projectile[j].position,
+                                world->enemies.projectile[j].dimension);
+        }
 
-                clear_projectile(
-                    world->enemies[index].projectile[j].previous_pos,
-                    world->enemies[index].projectile[j].dimension);
-                draw_projectile(type,
-                                world->enemies[index].projectile[j].position,
-                                world->enemies[index].projectile[j].dimension);
-            }
-            else if (world->enemies[index].projectile[j].needs_clear)
-            {
-                clear_projectile(world->enemies[index].projectile[j].position,
-                                 world->enemies[index].projectile[j].dimension);
-                world->enemies[index].projectile[j].needs_clear = 0;
-            }
+        drawSpaceShip(world->player, world);
+        world->enemies.needs_clear = 0;
+        }
+    //render enemy bullet
+    for (int j = 0; j < MAX_BULLETS; j++)
+    {
+        Type type = world->enemies.type;
+        if (world->enemies.projectile[j].needs_render)
+        {
+
+            clear_projectile(
+                world->enemies.projectile[j].previous_pos,
+                world->enemies.projectile[j].dimension);
+            draw_projectile(type,
+                            world->enemies.projectile[j].position,
+                            world->enemies.projectile[j].dimension);
+        }
+        else if (world->enemies.projectile[j].needs_clear)
+        {
+            clear_projectile(world->enemies.projectile[j].position,
+                                world->enemies.projectile[j].dimension);
+            world->enemies.projectile[j].needs_clear = 0;
         }
     }
 //render player
