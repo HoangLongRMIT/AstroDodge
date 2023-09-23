@@ -46,6 +46,10 @@ static int pauseGame;
 extern int isStage2;
 extern int check;
 static char str[50];
+
+//====================================================================================//
+//						         GAME OBJECTS DECLERATION   			              //
+//====================================================================================//
 typedef union {
     int current_health;
     int player_health;
@@ -137,6 +141,11 @@ typedef enum {
     RESET_VERTICAL,
     RESET_HORIZONTAL
 } Direction;
+
+
+//====================================================================================//
+//						         GAME FUNCTIONS DECLERATION   			              //
+//====================================================================================//
 static Dimension meteors= {100,100};
 void init_game(Game *world);
 void init_map(World *world);

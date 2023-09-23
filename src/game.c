@@ -44,25 +44,6 @@ void init_map(World *world)
     world->game_over = 0;
 }
 
-//restart the game
-//----------------------------------------------------------------------------
-void restart_game(Game *world)
-{
-    clearscreen(0, 0);
-    init_map(&world->world);
-    world->game_over = 0;
-    world->game_start = 0;
-    world->main_menu.on_game_menu = 1;
-    world->main_menu.game_start_menu = 1;
-    world->game_win = 0;
-    restartGame = 0;
-    isStage2 = 0;
-    check = 0;
-    displayGameUniverseBackground(0, 0);
-    pauseGame = 0;
-    quitGame = 0;
-}
-
 // Setting the value for player
 //----------------------------------------------------------------------------
 void init_player(Entity *player)
@@ -223,10 +204,6 @@ void pause_menu(World *world)
     }
     return;
 }
-
-//====================================================================================//
-//						    FUNCTIONS GAME OBJECT MOVEMENTS			                  //
-//====================================================================================//
 // Move the game forward
 //----------------------------------------------------------------------------
 void move_game(World *world)
@@ -295,6 +272,59 @@ void move_game(World *world)
     }
 }
 
+// display end screen
+//---------------------------------------------------------------------------- 
+void endScreen(int won, World *world)
+{
+
+    pauseGame = 1;
+    uart_puts("\n\n");
+    uart_puts("Press e to exit: \n");
+    uart_puts("Press r to restart: \n");
+    char *type = "d";
+    displayGameUniverseBackground(0, 0);
+
+    clearscreen(0, 0);
+    //win
+    if (won)
+    {
+        displayGameUniverseBackground(0, 0);
+        drawScore(world, type);
+        displayGameWinImage(300, 100);
+    }
+    //lose
+    else
+    {
+        displayGameUniverseBackground(0, 0);
+        drawScore(world, type);
+        displayGameOverImage(300, 100);
+    }
+    drawString(50, 180, "------------------", "yellow");
+    drawString(285, 250, "PRESS KEY", "bright magenta");
+    drawString(200, 320, "R-TO RESTART", "bright red");
+    drawString(200, 390, "E-TO EXIT", "bright green");
+    drawString(50, 460, "------------------", "bright blue");
+    // Display message to tell player to quit game or continue playing
+    while (!restartGame)
+    {
+        char character = uart_getc();
+        if (character == 'e')
+        {
+            quitGame = 1;
+            uart_puts("\n\nSuccessfully out!\n");
+            break;
+        }
+        if (character == 'r')
+        {
+            restartGame = 1;
+        }
+    }
+
+    return;
+}
+//====================================================================================//
+//						    FUNCTIONS GAME OBJECT MOVEMENTS			                  //
+//====================================================================================//
 // move player and enemy
 //----------------------------------------------------------------------------
 void move_entity(Entity *entity, Direction direction)
@@ -1127,57 +1157,24 @@ void drawSpaceShip(Entity entity, World *world)
         displaySpaceShipImage(x, y);
     }
 }
-// display end screen
-//---------------------------------------------------------------------------- 
-void endScreen(int won, World *world)
+//restart the game
+//----------------------------------------------------------------------------
+void restart_game(Game *world)
 {
-
-    pauseGame = 1;
-    uart_puts("\n\n");
-    uart_puts("Press e to exit: \n");
-    uart_puts("Press r to restart: \n");
-    char *type = "d";
-    displayGameUniverseBackground(0, 0);
-
     clearscreen(0, 0);
-    //win
-    if (won)
-    {
-        displayGameUniverseBackground(0, 0);
-        drawScore(world, type);
-        displayGameWinImage(300, 100);
-    }
-    //lose
-    else
-    {
-        displayGameUniverseBackground(0, 0);
-        drawScore(world, type);
-        displayGameOverImage(300, 100);
-    }
-    drawString(50, 180, "------------------", "yellow");
-    drawString(285, 250, "PRESS KEY", "bright magenta");
-    drawString(200, 320, "R-TO RESTART", "bright red");
-    drawString(200, 390, "E-TO EXIT", "bright green");
-    drawString(50, 460, "------------------", "bright blue");
-    // Display message to tell player to quit game or continue playing
-    while (!restartGame)
-    {
-        char character = uart_getc();
-        if (character == 'e')
-        {
-            quitGame = 1;
-            uart_puts("\n\nSuccessfully out!\n");
-            break;
-        }
-        if (character == 'r')
-        {
-            restartGame = 1;
-        }
-    }
-
-    return;
+    init_map(&world->world);
+    world->game_over = 0;
+    world->game_start = 0;
+    world->main_menu.on_game_menu = 1;
+    world->main_menu.game_start_menu = 1;
+    world->game_win = 0;
+    restartGame = 0;
+    isStage2 = 0;
+    check = 0;
+    displayGameUniverseBackground(0, 0);
+    pauseGame = 0;
+    quitGame = 0;
 }
-
 //clear entity
 //----------------------------------------------------------------------------
 void clear(Entity entity)
