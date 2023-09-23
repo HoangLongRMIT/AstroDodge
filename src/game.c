@@ -123,23 +123,23 @@ void move_player(World *world)
         {
             char character = uart_getc_game();
             if (character == 'a')
-            {
+            {//move left
                 move_entity(&world->player, LEFT);
                 world->player.velocity.y = 0;
             }
             else if (character == 'd')
-            {
+            {//move right
                 move_entity(&world->player, RIGHT);
                 world->player.velocity.y = 0;
             }
             else if (character == 'w')
-            {
+            {//move up
                 world->player.velocity.y = -VERTICAL_SPEED;
                 world->player.velocity.x = 0;
                 world->player.needs_update = 1;
             }
             else if (character == 's')
-            {
+            {//move down
                 world->player.velocity.y = VERTICAL_SPEED;
                 world->player.velocity.x = 0;
                 world->player.needs_update = 1;
@@ -152,12 +152,13 @@ void move_player(World *world)
             {//pause the game
                 pause_menu(world);
             }
-
+            //run functions to update all values before render the result
             update_AI_system(world);
             update_collision_system(world);
             update_combat_system(world);
             update_player_position(world);
             render(world);
+            //shoot per 10 count of wait_time_shoot;
             if (wait_time_shoot % 10 == 0 && wait_time_shoot != 100)
             {
                 enemy_shoot(world);
@@ -248,14 +249,14 @@ void pause_menu(World *world)
                 pauseGame = 0;
             }
             else if (world->game_menu.game_menu_option == 1)
-            {
+            {//restart game
                 displayGameUniverseBackground(0, 0);
                 printf("\nSELECT: Restart");
                 restartGame = 1;
                 return;
             }
             else if (world->game_menu.game_menu_option == 0)
-            {
+            {//quit game
                 displayGameUniverseBackground(0, 0);
                 printf("\nSELECT: Quit");
                 quitGame = 1;
@@ -268,22 +269,22 @@ void pause_menu(World *world)
 // move player and enemy
 //----------------------------------------------------------------------------
 void move_entity(Entity *entity, Direction direction)
-{
+{//depend on direction case change their velocity and tell the game to update the entity
     switch (direction)
     {
     case LEFT:
+    //if player then velocity is player speed else move enemy speed
         entity->velocity.x =
             (entity->type == PLAYER) ? -PLAYER_SPEED : -HORIZONTAL_SPEED;
-       
         entity->needs_update = 1;
         break;
     case RIGHT:
+    //if player then velocity is player speed else move enemy speed
         entity->velocity.x =
             (entity->type == PLAYER) ? PLAYER_SPEED : HORIZONTAL_SPEED;
         entity->needs_update = 1;
         break;
     case UP:
-      
         entity->velocity.y = -VERTICAL_SPEED;
         entity->needs_update = 1;
         break;
@@ -326,9 +327,9 @@ void update_player_position(World *world)
             world->player.position.x =
                 MAP_WIDTH - world->player.dimension.width;
         }
-        if (world->player.position.y < 0)
+        if (world->player.position.y < 100)
         {
-            world->player.position.y = 0;
+            world->player.position.y = 100;
         }
         else if (world->player.position.y >
                  MAP_HEIGHT - world->player.dimension.height)
@@ -336,17 +337,17 @@ void update_player_position(World *world)
             world->player.position.y =
                 MAP_HEIGHT - world->player.dimension.height;
         }
+        //player dont need update but need render
         world->player.needs_render = 1;
         world->player.needs_update = 0;
     }
 
     for (int i = 0; i < NUM_ENEMIES; i++)
-    {
+    {//move enemy
         if (world->enemies[i].needs_update)
         {
             world->enemies[i].previous_pos = world->enemies[i].position;
             world->enemies[i].position.x += world->enemies[i].velocity.x;
-            world->enemies[i].position.y += world->enemies[i].velocity.y;
             world->enemies[i].needs_render = 1;
             world->enemies[i].needs_update = 0;
         }
@@ -369,7 +370,7 @@ void update_player_position(World *world)
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         if (world->player.projectile[i].needs_update)
-        {
+        {//if not reach top then move
             if (world->player.projectile[i].position.y > TOP_MAX)
             {
                 world->player.projectile[i].previous_pos =
@@ -381,7 +382,7 @@ void update_player_position(World *world)
                 world->player.projectile[i].needs_render = 1;
             }
             else
-            {
+            {//clear
                 world->player.projectile[i].needs_render = 0;
                 world->player.projectile[i].active = 0;
                 world->player.projectile[i].needs_clear = 1;
@@ -393,7 +394,7 @@ void update_player_position(World *world)
     {
         int i = world->shooters[index];
         for (int j = 0; j < MAX_BULLETS; j++)
-        {
+        {//if not reach bottom then move
             if (world->enemies[i].projectile[j].needs_update)
             {
                 if (world->enemies[i].projectile[j].position.y < BOTTOM_MAX)
@@ -423,11 +424,11 @@ void enemy_shoot(World *world)
 
     int random = (rand() % 100) % 10;
     if (isStage2)
-    {
+    {//boss shoot
         entity_shoot(&world->enemies[world->shooters[0]], DOWN);
     }
     else
-    {
+    {//random shot meteor
         entity_shoot(&world->enemies[world->shooters[random]], DOWN);
     }
 }
@@ -461,7 +462,7 @@ void entity_shoot(Entity *entity, Direction direction)
     {
         if (!entity->projectile[i].active)
         {
-            // Initial a bullet from player
+            // Initial a bullet red laser from player in the middle
             if (entity->type == PLAYER)
             {
                 entity->projectile[i].position.x =
@@ -474,7 +475,7 @@ void entity_shoot(Entity *entity, Direction direction)
             else
             {
                 if (isStage2)
-                {// Initial a bullet from Boss
+                {// Initial a bullet green laser from Boss
                     entity->projectile[i].position.x =
                         entity->position.x + (entity->dimension.width / 2);
                     entity->projectile[i].position.y =
@@ -483,7 +484,7 @@ void entity_shoot(Entity *entity, Direction direction)
                     entity->projectile[i].dimension.width = green_laser.width;
                 }
                 else
-                {// Initial asteroid
+                {// Initial asteroid (bullet from invisible enemy)
                     entity->projectile[i].position.x =
                         randAsteroidPosition();
                     entity->projectile[i].position.y =
@@ -504,13 +505,8 @@ void entity_shoot(Entity *entity, Direction direction)
 //----------------------------------------------------------------------------
 void update_AI_system(World *world)
 {
-    /* vertical reset */
-    for (int i = 0; i < NUM_ENEMIES; i++)
-        move_entity(&world->enemies[i], RESET_VERTICAL);
-
     /* check wall collisions */
-    for (int i = 0; i < 6; i++)
-    {
+    
         if ((world->enemies[0].position.x +
              world->enemies[0].dimension.width) >= (RIGHT_MAX))
         {
@@ -521,7 +517,7 @@ void update_AI_system(World *world)
             travel_right = 1;
 
         }
-    }
+    
 
     /* move enemies right or left */
     for (int i = 0; i < NUM_ENEMIES; i++)
@@ -584,11 +580,11 @@ int intersectMtoM(Missile *projectile, Missile *projectile2)
 //handle intersect projectile and entity
 //----------------------------------------------------------------------------
 void collisionsME(Missile *projectile, Entity *entity)
-{
+{//if both missile and entity is active and they intersect then update value
     int isEnabled = entity->enabled;
     int intersects = intersectMtoE(projectile, entity);
     if (isEnabled && intersects)
-    {
+    {//clear projectile and update entity
         projectile->active = 0;
         projectile->needs_update = 0;
         projectile->needs_render = 0;
@@ -600,10 +596,10 @@ void collisionsME(Missile *projectile, Entity *entity)
 //handle intersect of 2 projectile 
 //----------------------------------------------------------------------------
 void collisionsMM(Missile *projectile, Missile *projectile2, World *world)
-{
+{//if both missle intersect then update value
     int intersects = intersectMtoM(projectile, projectile2);
     if (intersects)
-    {
+    {//explode, clear both projectile and update score
         drawExplosionBig(projectile2);
         wait_msec(1000);
         projectile->active = 0;
@@ -626,19 +622,19 @@ void update_collision_system(World *world)
 {
     Entity *player = &world->player;
     Entity *enemy = world->enemies;
-//check collision between player projectile and enemy projectile
+//check collision of player projectile and enemy projectile
     for (int i = 0; i < 10; i++)
     {
         int index = world->shooters[i];
         for (int j = 0; j < MAX_BULLETS; j++)
         {
             if (enemy[index].projectile[j].active)
-            {
+            {//check if enemy projectile collide with player
                 collisionsME(&enemy[index].projectile[j], player);
                 for (int a = 0; a < MAX_BULLETS; a++)
                 {
                     if (player->projectile[a].active)
-                    {
+                    {// check player and enemy projectile collide
                         collisionsMM(&player->projectile[a], &enemy[index].projectile[j], world);
                     }
                 }
@@ -662,7 +658,7 @@ void update_collision_system(World *world)
 // Function to update the score and health from gameplay
 //----------------------------------------------------------------------------
 void update_combat_system(World *world)
-{
+{//player lose health
     if (world->player.combat_update)
     {
         drawExplosion(world->player);
@@ -705,9 +701,9 @@ void update_combat_system(World *world)
 
             check = 1;
             world->enemies[0].position.x =
-                alien_initial_x + (HORIZONTAL_OFFSET * 0);
+                enemy_initial_x + (HORIZONTAL_OFFSET * 0);
             world->enemies[0].position.y =
-                alien_initial_y + 50;
+                enemy_initial_y + 50;
 
             world->enemies[0].dimension.height = boss_image.height;
             world->enemies[0].dimension.width = boss_image.width;
@@ -724,7 +720,7 @@ void update_combat_system(World *world)
             world->enemies[0].health.current_health -= 1;
              printf("Boss health: %d\n", world->enemies[0].health.current_health);
             if (world->enemies[0].health.current_health <= 0)
-            {
+            {//clear boss and end game when boss die
                 world->enemies[0].enabled = 0;
                 world->enemies[0].needs_clear = 1;
                 wait_msec(500);
@@ -736,7 +732,7 @@ void update_combat_system(World *world)
 }
 
 
-// Draw the enity using the data has set
+// Draw the etity using the data has set
 //----------------------------------------------------------------------------
 void render(World *world)
 {
@@ -745,7 +741,7 @@ void render(World *world)
         return;
     }
     wait_msec(30000);
-
+//render player bullet
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         Type type = world->player.type;
@@ -764,7 +760,7 @@ void render(World *world)
             world->player.projectile[i].needs_clear = 0;
         }
     }
-
+//render enemy
     for (int i = 0; i < NUM_ENEMIES; i++)
     {
         if (world->enemies[i].needs_render && world->enemies[i].enabled)
@@ -788,7 +784,7 @@ void render(World *world)
             world->enemies[i].needs_clear = 0;
         }
     }
-
+//render enemy bullet
     for (int i = 0; i < MAX_SHOOTERS; i++)
     {
         for (int j = 0; j < MAX_BULLETS; j++)
@@ -813,7 +809,7 @@ void render(World *world)
             }
         }
     }
-
+//render player
     if (world->player.needs_render && world->player.enabled)
     {
         clear(world->player);
@@ -826,11 +822,12 @@ void render(World *world)
         wait_msec(500);
         world->player.needs_clear = 0;
     }
-
+//render life
     if (world->life.needs_render)
     {
         render_health(world);
     }
+    //render score
     if (world->playerScore.needsRender)
     {
         char *type = "";
@@ -992,8 +989,8 @@ void update_score(World *world)
 {
 
     // Score per hit
-    // world->playerScore.score += 100;
-    world->playerScore.score += 30;
+    world->playerScore.score += 100;
+    //world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
      printf("Score: %d\n", world->playerScore.score);
@@ -1107,7 +1104,6 @@ void endScreen(int won, World *world)
     }
     drawString(50, 180, "------------------", "yellow");
     drawString(285, 250, "PRESS KEY", "bright magenta");
-    // drawString(160, 320, "TO RESTART - R", "bright red");
     drawString(200, 320, "R-TO RESTART", "bright red");
     drawString(200, 390, "0-TO EXIT", "bright green");
     drawString(50, 460, "------------------", "bright blue");

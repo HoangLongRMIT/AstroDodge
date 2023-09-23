@@ -8,8 +8,8 @@
 
 #define NUM_ENEMIES (12)
 
-#define alien_initial_y 0
-#define alien_initial_x 200
+#define enemy_initial_y 0
+#define enemy_initial_x 200
 #define HORIZONTAL_OFFSET 61
 #define VERTICAL_OFFSET 61
 
@@ -69,7 +69,7 @@ typedef struct {
     int needsRender;
 } Score;
 
-typedef enum { PLAYER = 1,ENEMIES=2, BOSS=3} Type;
+typedef enum { PLAYER = 1, BOSS=3} Type;
 
 typedef struct {
     Position position;
