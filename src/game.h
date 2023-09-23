@@ -185,9 +185,9 @@ void drawExplosionBig(Projectile* projectile);
 int randAsteroidPosition();
 void restart_game(Game *world);
 void drawSpaceShip(Entity entity, World *world);
-int intersectMtoE(Projectile *projectile, Entity *entity);
-int intersectMtoM(Projectile *projectile, Projectile *projectile2);
-void collisionsME(Projectile *projectile, Entity *entity);
-void collisionsMM(Projectile *projectile, Projectile *projectile2, World *world);
+int intersectPtoE(Projectile *projectile, Entity *entity);
+int intersectPtoP(Projectile *projectile, Projectile *projectile2);
+void collisionsPE(Projectile *projectile, Entity *entity);
+void collisionsPP(Projectile *projectile, Projectile *projectile2, World *world);
 
 // void displaySpaceShipImage(int x, int y);

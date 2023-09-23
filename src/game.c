@@ -552,7 +552,7 @@ void move_bullet(Projectile *projectile, Direction direction)
 
 // check intersect projectile and entity
 //----------------------------------------------------------------------------
-int intersectMtoE(Projectile *projectile, Entity *entity)
+int intersectPtoE(Projectile *projectile, Entity *entity)
 {
     return projectile->position.x <
                (entity->position.x + entity->dimension.width) &&
@@ -565,7 +565,7 @@ int intersectMtoE(Projectile *projectile, Entity *entity)
 }
 //check intersect of 2 projectile 
 //----------------------------------------------------------------------------
-int intersectMtoM(Projectile *projectile, Projectile *projectile2)
+int intersectPtoP(Projectile *projectile, Projectile *projectile2)
 {
     return projectile->position.x <
                (projectile2->position.x + projectile2->dimension.width) &&
@@ -579,10 +579,10 @@ int intersectMtoM(Projectile *projectile, Projectile *projectile2)
 
 //handle intersect projectile and entity
 //----------------------------------------------------------------------------
-void collisionsME(Projectile *projectile, Entity *entity)
+void collisionsPE(Projectile *projectile, Entity *entity)
 {//if both projectile and entity is active and they intersect then update value
     int isEnabled = entity->enabled;
-    int intersects = intersectMtoE(projectile, entity);
+    int intersects = intersectPtoE(projectile, entity);
     if (isEnabled && intersects)
     {//clear projectile and update entity
         projectile->active = 0;
@@ -595,9 +595,9 @@ void collisionsME(Projectile *projectile, Entity *entity)
 
 //handle intersect of 2 projectile 
 //----------------------------------------------------------------------------
-void collisionsMM(Projectile *projectile, Projectile *projectile2, World *world)
+void collisionsPP(Projectile *projectile, Projectile *projectile2, World *world)
 {//if both projectile intersect then update value
-    int intersects = intersectMtoM(projectile, projectile2);
+    int intersects = intersectPtoP(projectile, projectile2);
     if (intersects)
     {//explode, clear both projectile and update score
         drawExplosionBig(projectile2);
@@ -630,12 +630,12 @@ void update_collision(World *world)
         {
             if (enemy[index].projectile[j].active)
             {//check if enemy projectile collide with player
-                collisionsME(&enemy[index].projectile[j], player);
+                collisionsPE(&enemy[index].projectile[j], player);
                 for (int a = 0; a < MAX_BULLETS; a++)
                 {
                     if (player->projectile[a].active)
                     {// check player and enemy projectile collide
-                        collisionsMM(&player->projectile[a], &enemy[index].projectile[j], world);
+                        collisionsPP(&player->projectile[a], &enemy[index].projectile[j], world);
                     }
                 }
             }
@@ -647,7 +647,7 @@ void update_collision(World *world)
             {
                 if (player->projectile[a].active)
                 {
-                    collisionsME(&player->projectile[a], &enemy[0]);
+                    collisionsPE(&player->projectile[a], &enemy[0]);
                 }
             }
         }
