@@ -748,8 +748,6 @@ void update_combat(World *world)
             }
 
             check = 1;
-            if (check == 1)
-                printf("\n BOSS HEALTH: 5\n");
             world->enemies.position.x =
                 enemy_initial_x + (HORIZONTAL_OFFSET * 0);
             world->enemies.position.y =
@@ -759,6 +757,11 @@ void update_combat(World *world)
             world->enemies.dimension.width = boss_image.width;
             world->enemies.health.current_health = BOSS_HEALTH;
             world->enemies.type = BOSS;
+            if (check == 1)
+                {
+                    printf("\n <=====BOSS WAVE=====> \n");
+                    printf("\n BOSS HEALTH: %d\n", world->enemies.health.current_health);
+                }
         }
     }
 
