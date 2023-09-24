@@ -174,7 +174,7 @@ void pause_menu(World *world)
             {//resume game
                 world->game_menu.on_gameMenu_menu = 0;
                 displayGameUniverseBackground(0, 0);
-                printf("\nSELECT: Resume");
+                printf("\nSELECT: Resume\n");
                 world->life.needs_render = 1;
                 world->playerScore.needsRender = 1;
                 world->player.needs_render = 1;
@@ -183,14 +183,14 @@ void pause_menu(World *world)
             else if (world->game_menu.game_menu_option == 1)
             {//restart game
                 displayGameUniverseBackground(0, 0);
-                printf("\nSELECT: Restart");
+                printf("\nSELECT: Restart\n");
                 restartGame = 1;
                 return;
             }
             else if (world->game_menu.game_menu_option == 0)
             {//quit game
                 displayGameUniverseBackground(0, 0);
-                printf("\nSELECT: Quit");
+                printf("\nSELECT: Quit\n");
                 quitGame = 1;
                 return;
             }
