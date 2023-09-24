@@ -725,10 +725,7 @@ void update_combat(World *world)
         if (world->player.health.current_health == 0)
         {
             if(world->player.enabled == 0)
-            {
-                //printf("\nHEALTH: 0\n");
                 printf("\n======YOU DIED======\n");
-            }
             clearPlayerLife(170, 20);
             drawString(170, 10, "0", "white");
             endScreen(0, world);
@@ -751,6 +748,8 @@ void update_combat(World *world)
             }
 
             check = 1;
+            if (check == 1)
+                printf("\n BOSS HEALTH: 5\n");
             world->enemies.position.x =
                 enemy_initial_x + (HORIZONTAL_OFFSET * 0);
             world->enemies.position.y =
@@ -771,11 +770,13 @@ void update_combat(World *world)
         {
             drawExplosion(world->enemies);
             world->enemies.health.current_health -= 1;
+            uart_puts("\n +++ HIT +++ \n");
             printf("\n BOSS HEALTH: %d\n", world->enemies.health.current_health);
             if (world->enemies.health.current_health <= 0)
             {//clear boss and end game when boss die
                 world->enemies.enabled = 0;
                 world->enemies.needs_clear = 1;
+                printf("\n======YOU WON======\n");
                 wait_msec(500);
                 endScreen(1, world);
             }
