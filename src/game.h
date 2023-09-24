@@ -4,9 +4,6 @@
 #include "uart.h"
 
 #define BOSS_HEALTH 5
-#define NUM_PAWNS 20
-
-#define NUM_ENEMIES (12)
 
 #define enemy_initial_y 0
 #define enemy_initial_x 200
@@ -28,8 +25,6 @@
 
 #define MAP_WIDTH 1024
 #define MAP_HEIGHT 768
-
-#define MAX_SHOOTERS 10
 
 #define SCORE_ORIGINX 850
 #define SCORE_ORIGINY 5
@@ -85,7 +80,7 @@ typedef struct {
     int needs_clear;
     int active;
 } Projectile;
-/* ship, shooter */
+/* ship, boss */
 typedef struct {
     Velocity velocity;
     Dimension dimension;
@@ -112,11 +107,7 @@ typedef struct {
 
 typedef struct map {
     Entity player;
-    Entity enemies[NUM_ENEMIES];
-    int shooters[MAX_SHOOTERS];
-    int left_most_enemies[6];
-    int right_most_enemies[6];
-    int enemies_alive;
+    Entity enemies;
     int game_over;
     Score playerScore;
     Entity life;
