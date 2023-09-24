@@ -76,7 +76,7 @@ typedef struct {
     int needs_clear;
     int active;
 } Projectile;
-/* ship, shooter */
+/* ship, boss */
 typedef struct {
     Velocity velocity;
     Dimension dimension;
@@ -104,9 +104,6 @@ typedef struct {
 typedef struct map {
     Entity player;
     Entity enemies;
-    int shooters[MAX_SHOOTERS];
-    int left_most_enemies[6];
-    int right_most_enemies[6];
     int game_over;
     Score playerScore;
     Entity life;
