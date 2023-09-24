@@ -113,7 +113,7 @@ void show_main_menu(Game *game)
 
     uart_puts("Press s to move down: \n");
     uart_puts("Press w to move up: \n");
-    uart_puts("Press space to choose: \n");
+    uart_puts("Press space to confirm: \n\n");
     drawMainMenu(game);
     while (game->main_menu.on_game_menu)
     {
@@ -147,10 +147,13 @@ void pause_menu(World *world)
     world->game_menu.game_menu_option = 1;
     world->game_menu.on_gameMenu_menu = 1;
     pauseGame = 1;
+
+    uart_puts("\nPress s to move down: \n");
+    uart_puts("Press w to move up: \n");
+    uart_puts("Press space to choose: \n");
+
     while (world->game_menu.on_gameMenu_menu)
     {
-
-
         drawPauseMenu(world);
         char character = uart_getc_game();
 
@@ -206,7 +209,7 @@ void move_game(World *world)
     uart_puts("Press D to move right: \n");
     uart_puts("Press W to move up: \n");
     uart_puts("Press S to move down: \n");
-    uart_puts("Press SPACE to move down: \n");
+    uart_puts("Press SPACE to shoot: \n");
     uart_puts("Press P to stop: \n");
     while (!quitGame && !restartGame)
     {
@@ -656,7 +659,7 @@ void collisionsPP(Projectile *projectile, Projectile *projectile2, World *world)
         projectile2->needs_clear = 1;
         update_score(world);
         world->playerScore.needsRender = 1;
-        uart_puts("hit \n");
+        uart_puts("\n +++ HIT +++ \n");
     }
 }
 
@@ -709,6 +712,10 @@ void update_combat(World *world)
         drawSpaceShip(world->player, world);
         world->life.needs_render = 1;
         world->player.health.current_health -= 1;
+        
+        uart_puts("\n !!! CRASHED !!! \n");
+        uart_puts("\n [-1 HEALTH POINT] \n");
+
         if (world->player.health.current_health <= 0)
         {
             world->player.enabled = 0;
@@ -717,6 +724,11 @@ void update_combat(World *world)
         world->player.combat_update = 0;
         if (world->player.health.current_health == 0)
         {
+            if(world->player.enabled == 0)
+            {
+                //printf("\nHEALTH: 0\n");
+                printf("\n======YOU DIED======\n");
+            }
             clearPlayerLife(170, 20);
             drawString(170, 10, "0", "white");
             endScreen(0, world);
@@ -752,12 +764,14 @@ void update_combat(World *world)
     }
 
     if (isStage2)
-    {//boss lose health
+    {
+        
+        //boss lose health
         if (world->enemies.combat_update)
         {
             drawExplosion(world->enemies);
             world->enemies.health.current_health -= 1;
-             printf("Boss health: %d\n", world->enemies.health.current_health);
+            printf("\n BOSS HEALTH: %d\n", world->enemies.health.current_health);
             if (world->enemies.health.current_health <= 0)
             {//clear boss and end game when boss die
                 world->enemies.enabled = 0;
@@ -936,31 +950,38 @@ void drawScore(World *world, char *type)
 void render_health(World *world)
 {
     int clife = (world->player.health.current_health);
-    printf("health: %d\n", clife);
     displayWordPlayerLife(13, 10);
+    int trigger;
 
     if (clife == 0)
     {
         clearPlayerLife(170, 30);
         drawString(170, 10, "0", "white");
+        if(trigger == 0)
+            printf("\nHEALTH: %d\n", clife);
+        trigger = 1;
     }
 
     if (clife == 1)
     {
         clearPlayerLife(210, 20);
         displayPlayerLife(170, 20);
+        printf("\nHEALTH: %d\n", clife);
     }
     if (clife == 2)
     {
         clearPlayerLife(250, 20);
         displayPlayerLife(170, 20);
         displayPlayerLife(210, 20);
+        printf("\nHEALTH: %d\n", clife);
     }
     if (clife == 3)
     {
         displayPlayerLife(170, 20);
         displayPlayerLife(210, 20);
         displayPlayerLife(250, 20);
+        printf("\nHEALTH: %d\n", clife);
+        trigger = 0;
     }
 
     world->life.needs_render = 0;
@@ -1008,7 +1029,7 @@ void update_score(World *world)
     world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
-     printf("Score: %d\n", world->playerScore.score);
+     printf("\nScore: %d [+30 POINTS]\n", world->playerScore.score);
 }
 
 //draw the pause menu
@@ -1094,7 +1115,6 @@ void drawExplosion(Entity entity)
 
     if (entity.type == PLAYER)
     {
-        uart_puts("Dead \n");
         displayExplosion(x, y);
     }
 }
