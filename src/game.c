@@ -11,6 +11,9 @@
 
 int wait_time_shoot = 100;
 
+//====================================================================================//
+//						      FUNCTIONS GAME INITIALIZING			                  //
+//====================================================================================//
 //initalize the game
 //----------------------------------------------------------------------------
 void init_game(Game *world)
@@ -38,25 +41,6 @@ void init_map(World *world)
     world->game_menu.game_menu_option = 0;
     world->game_menu.on_gameMenu_menu = 0;
     world->game_over = 0;
-}
-
-//restart the game
-//----------------------------------------------------------------------------
-void restart_game(Game *world)
-{
-    clearscreen(0, 0);
-    init_map(&world->world);
-    world->game_over = 0;
-    world->game_start = 0;
-    world->main_menu.on_game_menu = 1;
-    world->main_menu.game_start_menu = 1;
-    world->game_win = 0;
-    restartGame = 0;
-    isStage2 = 0;
-    check = 0;
-    displayGameUniverseBackground(0, 0);
-    pauseGame = 0;
-    quitGame = 0;
 }
 
 // Setting the value for player
@@ -101,73 +85,27 @@ void init_enemies(World *world)
     }
 }
 
-// Move the game forward
+//init player life
 //----------------------------------------------------------------------------
-void move_game(World *world)
+void init_life(Entity *life)
 {
-    uart_puts("Press A to move left: \n");
-    uart_puts("Press D to move right: \n");
-    uart_puts("Press W to move up: \n");
-    uart_puts("Press S to move down: \n");
-    uart_puts("Press SPACE to move down: \n");
-    uart_puts("Press P to stop: \n");
-    while (!quitGame && !restartGame)
-    {
-        while (!pauseGame)
-        {//code to move player
-            char character = uart_getc_game();
-            if (character == 'a')
-            {//move left
-                move_entity(&world->player, LEFT);
-                world->player.velocity.y = 0;
-            }
-            else if (character == 'd')
-            {//move right
-                move_entity(&world->player, RIGHT);
-                world->player.velocity.y = 0;
-            }
-            else if (character == 'w')
-            {//move up
-                world->player.velocity.y = -VERTICAL_SPEED;
-                world->player.velocity.x = 0;
-                world->player.needs_update = 1;
-            }
-            else if (character == 's')
-            {//move down
-                world->player.velocity.y = VERTICAL_SPEED;
-                world->player.velocity.x = 0;
-                world->player.needs_update = 1;
-            }
-            else if (character == ' ')
-            {//space is shoot
-                entity_shoot(&world->player, UP);
-            }
-            else if (character == 'p')
-            {//pause the game
-                pause_menu(world);
-            }
-            //run functions to update all values before render the result
-            update_AI(world);
-            update_collision(world);
-            update_combat(world);
-            update_position(world);
-            render(world);
-            //shoot per 10 count of wait_time_shoot;
-            if (wait_time_shoot % 10 == 0 && wait_time_shoot != 100)
-            {
-                enemy_shoot(world);
-            }
-            if (wait_time_shoot == 100)
-            {
-                enemy_shoot(world);
-                wait_time_shoot = 0;
-            }
-            {
-                wait_time_shoot++;
-            }
-        }
-    }
+    life->health.player_health = 3;
+    life->needs_update = 0;
+    life->needs_render = 1;
 }
+
+//init player score
+//----------------------------------------------------------------------------
+void init_playerScore(Score *playerScore)
+{
+    playerScore->score = 0;
+    playerScore->needsUpdate = 0;
+    playerScore->needsRender = 1;
+}
+
+//====================================================================================//
+//						      FUNCTIONS GAME MENU COMMAND			                  //
+//====================================================================================//
 //show main menu before game
 //----------------------------------------------------------------------------
 void show_main_menu(Game *game)
@@ -260,6 +198,127 @@ void pause_menu(World *world)
     }
     return;
 }
+// Move the game forward
+//----------------------------------------------------------------------------
+void move_game(World *world)
+{
+    uart_puts("Press A to move left: \n");
+    uart_puts("Press D to move right: \n");
+    uart_puts("Press W to move up: \n");
+    uart_puts("Press S to move down: \n");
+    uart_puts("Press SPACE to move down: \n");
+    uart_puts("Press P to stop: \n");
+    while (!quitGame && !restartGame)
+    {
+        while (!pauseGame)
+        {//code to move player
+            char character = uart_getc_game();
+            if (character == 'a')
+            {//move left
+                move_entity(&world->player, LEFT);
+                world->player.velocity.y = 0;
+            }
+            else if (character == 'd')
+            {//move right
+                move_entity(&world->player, RIGHT);
+                world->player.velocity.y = 0;
+            }
+            else if (character == 'w')
+            {//move up
+                world->player.velocity.y = -VERTICAL_SPEED;
+                world->player.velocity.x = 0;
+                world->player.needs_update = 1;
+            }
+            else if (character == 's')
+            {//move down
+                world->player.velocity.y = VERTICAL_SPEED;
+                world->player.velocity.x = 0;
+                world->player.needs_update = 1;
+            }
+            else if (character == ' ')
+            {//space is shoot
+                entity_shoot(&world->player, UP);
+            }
+            else if (character == 'p')
+            {//pause the game
+                pause_menu(world);
+            }
+            //run functions to update all values before render the result
+            update_AI(world);
+            update_collision(world);
+            update_combat(world);
+            update_position(world);
+            render(world);
+            //shoot per 10 count of wait_time_shoot;
+            if (wait_time_shoot % 10 == 0 && wait_time_shoot != 100)
+            {
+                enemy_shoot(world);
+            }
+            if (wait_time_shoot == 100)
+            {
+                enemy_shoot(world);
+                wait_time_shoot = 0;
+            }
+            {
+                wait_time_shoot++;
+            }
+        }
+    }
+}
+
+// display end screen
+//---------------------------------------------------------------------------- 
+void endScreen(int won, World *world)
+{
+
+    pauseGame = 1;
+    uart_puts("\n\n");
+    uart_puts("Press e to exit: \n");
+    uart_puts("Press r to restart: \n");
+    char *type = "d";
+    displayGameUniverseBackground(0, 0);
+
+    clearscreen(0, 0);
+    //win
+    if (won)
+    {
+        displayGameUniverseBackground(0, 0);
+        drawScore(world, type);
+        displayGameWinImage(300, 100);
+    }
+    //lose
+    else
+    {
+        displayGameUniverseBackground(0, 0);
+        drawScore(world, type);
+        displayGameOverImage(300, 100);
+    }
+    drawString(50, 180, "------------------", "yellow");
+    drawString(285, 250, "PRESS KEY", "bright magenta");
+    drawString(200, 320, "R-TO RESTART", "bright red");
+    drawString(200, 390, "E-TO EXIT", "bright green");
+    drawString(50, 460, "------------------", "bright blue");
+    // Display message to tell player to quit game or continue playing
+    while (!restartGame)
+    {
+        char character = uart_getc();
+        if (character == 'e')
+        {
+            quitGame = 1;
+            uart_puts("\n\nSuccessfully out!\n");
+            break;
+        }
+        if (character == 'r')
+        {
+            restartGame = 1;
+        }
+    }
+
+    return;
+}
+//====================================================================================//
+//						    FUNCTIONS GAME OBJECT MOVEMENTS			                  //
+//====================================================================================//
 // move player and enemy
 //----------------------------------------------------------------------------
 void move_entity(Entity *entity, Direction direction)
@@ -532,7 +591,9 @@ void move_bullet(Projectile *projectile, Direction direction)
     }
 }
 
-
+//====================================================================================//
+//						    FUNCTIONS GAME OBJECT COLLISIONS			              //
+//====================================================================================//
 // check intersect projectile and entity
 //----------------------------------------------------------------------------
 int intersectPtoE(Projectile *projectile, Entity *entity)
@@ -633,7 +694,9 @@ void update_collision(World *world)
         }
 }
 
-
+//====================================================================================//
+//						      FUNCTIONS GAME OBJECT RENDER	    		              //
+//====================================================================================//
 // Function to update the score and health from gameplay
 //----------------------------------------------------------------------------
 void update_combat(World *world)
@@ -936,42 +999,18 @@ void render_score(int num, int x, int y)
     else if (num == 0)
         drawString(x, y, "0", "yellow");
 }
-//init player life
+// Function to update score per hit
 //----------------------------------------------------------------------------
-void init_life(Entity *life)
-{
-    life->health.player_health = 3;
-    life->needs_update = 0;
-    life->needs_render = 1;
-}
-
-//init player score
-///----------------------------------------------------------------------------
-void init_playerScore(Score *playerScore)
-{
-    playerScore->score = 0;
-    playerScore->needsUpdate = 0;
-    playerScore->needsRender = 1;
-}
-
 void update_score(World *world)
 {
-
     // Score per hit
-    world->playerScore.score += 100;
-    //world->playerScore.score += 30;
+    // world->playerScore.score += 100;
+    world->playerScore.score += 30;
     //set cap
     if (world->playerScore.score>9999) world->playerScore.score =9999;
      printf("Score: %d\n", world->playerScore.score);
 }
 
-void *memcpy(void *dest, const void *src, unsigned long n)
-{
-    for (unsigned long i = 0; i < n; i++)
-    {
-        ((char *)dest)[i] = ((char *)src)[i];
-    }
-}
 //draw the pause menu
 //----------------------------------------------------------------------------
 void drawPauseMenu(World *game)
@@ -1044,56 +1083,6 @@ void drawMainMenu(Game *game)
     }
 }
 
-//display end screen
-//---------------------------------------------------------------------------- 
-void endScreen(int won, World *world)
-{
-
-    pauseGame = 1;
-    uart_puts("\n\n");
-    uart_puts("Press e to exit: \n");
-    uart_puts("Press r to restart: \n");
-    char *type = "d";
-    displayGameUniverseBackground(0, 0);
-
-    clearscreen(0, 0);
-    //win
-    if (won)
-    {
-        displayGameUniverseBackground(0, 0);
-        drawScore(world, type);
-        displayGameWinImage(300, 100);
-    }
-    //lose
-    else
-    {
-        displayGameUniverseBackground(0, 0);
-        drawScore(world, type);
-        displayGameOverImage(300, 100);
-    }
-    drawString(50, 180, "------------------", "yellow");
-    drawString(285, 250, "PRESS KEY", "bright magenta");
-    drawString(200, 320, "R-TO RESTART", "bright red");
-    drawString(200, 390, "E-TO EXIT", "bright green");
-    drawString(50, 460, "------------------", "bright blue");
-    // Display message to tell player to quit game or continue playing
-    while (!restartGame)
-    {
-        char character = uart_getc();
-        if (character == 'e')
-        {
-            quitGame = 1;
-            uart_puts("\n\nSuccessfully out!\n");
-            break;
-        }
-        if (character == 'r')
-        {
-            restartGame = 1;
-        }
-    }
-
-    return;
-}
 //draw explosion for entity
 //----------------------------------------------------------------------------
 void drawExplosion(Entity entity)
@@ -1136,6 +1125,24 @@ void drawSpaceShip(Entity entity, World *world)
 
         displaySpaceShipImage(x, y);
     }
+}
+//restart the game
+//----------------------------------------------------------------------------
+void restart_game(Game *world)
+{
+    clearscreen(0, 0);
+    init_map(&world->world);
+    world->game_over = 0;
+    world->game_start = 0;
+    world->main_menu.on_game_menu = 1;
+    world->main_menu.game_start_menu = 1;
+    world->game_win = 0;
+    restartGame = 0;
+    isStage2 = 0;
+    check = 0;
+    displayGameUniverseBackground(0, 0);
+    pauseGame = 0;
+    quitGame = 0;
 }
 //clear entity
 //----------------------------------------------------------------------------

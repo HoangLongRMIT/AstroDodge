@@ -57,6 +57,73 @@ int abs(int x)
     return (x < 0) ? -x : x;
 }
 
+// Function convert num to string
+//--------------------------------------------------------------------------------
+void tostring(char str[], int num)
+{
+    int i, rem, len = 0, n;
+ 
+    n = num;
+    while (n != 0)
+    {
+        len++;
+        n /= 10;
+    }
+    for (i = 0; i < len; i++)
+    {
+        rem = num % 10;
+        num = num / 10;
+        str[len - (i + 1)] = rem + '0';
+    }
+    str[len] = '\0';
+}
+// Generate a function to find the length of the string
+//--------------------------------------------------------------------------------
+int string_length(char *str)
+{
+  int i = 0;
+  while (str[i] != '\0')
+  {
+    i++;
+  }
+  return i;
+}
+
+// Generate a function convert integer to string and return string
+//--------------------------------------------------------------------------------
+void integer_to_string(int n, char *str)
+{
+  int i = 0;
+  while (n != 0)
+  {
+    int rem = n % 10;
+    str[i] = rem + '0';
+    n = n / 10;
+    i++;
+  }
+  str[i] = '\0';
+  // reverse the string
+  int j = 0;
+  int k = string_length(str) - 1;
+  while (j < k)
+  {
+    char temp = str[j];
+    str[j] = str[k];
+    str[k] = temp;
+    j++;
+    k--;
+  }
+}
+// Function copy pointer
+//--------------------------------------------------------------------------------
+void *memcpy(void *dest, const void *src, unsigned long n)
+{
+    for (unsigned long i = 0; i < n; i++)
+    {
+        ((char *)dest)[i] = ((char *)src)[i];
+    }
+}
+
 //====================================================================================//
 //								                IMAGE VIDEO FONT    							              	  //
 //====================================================================================//
@@ -95,7 +162,7 @@ void clearscreen(int x, int y){
 }
 
 //====================================================================================//
-//										                DISPLAY MENU							    		  	          //
+//										           DISPLAY COMMAND MENU							    		  	        //
 //====================================================================================//
 // Function to display commands menu
 //--------------------------------------------------------------------------------
@@ -137,56 +204,3 @@ void welcome_text(){
 	uart_puts("\n----------------------------------------------------------------------------------------------\n");
 }
 
-void tostring(char str[], int num)
-{
-    int i, rem, len = 0, n;
- 
-    n = num;
-    while (n != 0)
-    {
-        len++;
-        n /= 10;
-    }
-    for (i = 0; i < len; i++)
-    {
-        rem = num % 10;
-        num = num / 10;
-        str[len - (i + 1)] = rem + '0';
-    }
-    str[len] = '\0';
-}
-// Generate a function to find the length of the string
-int string_length(char *str)
-{
-  int i = 0;
-  while (str[i] != '\0')
-  {
-    i++;
-  }
-  return i;
-}
-
-// Generate a function convert integer to string and return string
-void integer_to_string(int n, char *str)
-{
-  int i = 0;
-  while (n != 0)
-  {
-    int rem = n % 10;
-    str[i] = rem + '0';
-    n = n / 10;
-    i++;
-  }
-  str[i] = '\0';
-  // reverse the string
-  int j = 0;
-  int k = string_length(str) - 1;
-  while (j < k)
-  {
-    char temp = str[j];
-    str[j] = str[k];
-    str[k] = temp;
-    j++;
-    k--;
-  }
-}
