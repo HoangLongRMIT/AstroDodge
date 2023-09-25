@@ -95,13 +95,13 @@ void controlScrollableImage()
     char character = uart_getc();
     
     // Scroll down the image withing the range of row to scroll as defined
-    if (character == 's' && (row <= image2_height - MAX_DOWN_HEIGHT - BUFFER_STEP))
+    if (character == 'w' && (row <= image2_height - MAX_DOWN_HEIGHT - BUFFER_STEP))
 		{
       row = row + BUFFER_STEP;
 			display_image_2(row);
 		}
     // Scroll up the image withing the range of row to scroll as defined
-    else if (character == 'w' && (row >= BUFFER_STEP))
+    else if (character == 's' && (row >= BUFFER_STEP))
 		{
 			row = row - BUFFER_STEP;
 			display_image_2(row);
