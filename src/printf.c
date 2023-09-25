@@ -1,621 +1,487 @@
-#define SPACE 0x20
-#include "printf.h"
+// ----------------------------------- printf.c ------------------------------------- //
+// Description:
+//		This function handles any function regard to the task 2 of the asm2
+// Refernce:
+//		itoa from scratch: https://www.geeksforgeeks.org/implement-itoa/
+// 		va_arg: https://www.ibm.com/docs/en/zos/2.3.0?topic=lf-va-arg-va-copy-va-end-va-start-access-function-arguments 
+//		width: https://www.lix.polytechnique.fr/~liberti/public/computing/prog/c/C/FUNCTIONS/format.html
 
+
+#include "printf.h"
+#include "function.h"
+#include "cli_function.h"
 #include "uart.h"
+
 
 #define MAX_PRINT_SIZE 256
 
-void printf(char* string, ...) {
-    va_list ap;
-    va_start(ap, string);
-
-    char buffer[MAX_PRINT_SIZE];
-    int buffer_idx = 0;
-
-    char temp_buffer[MAX_PRINT_SIZE];
-    clear_buffer(buffer);
-    while (1) {
-        if (*string == 0) break;
-
-        if (*string == '%') {
-            string++;
-            if (*string == 'd') {
-                /*
-                1. If the number is negative, it puts a '-' in the buffer.
-                2.  It then converts the number to a string and puts it in the
-                buffer.
-                3.  It then prints the buffer in decimal number. */
-                string++;
-
-                int x = va_arg(ap, int);
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                if (x < 0) {
-                    x *= (-1);
-                    buffer[buffer_idx] = '-';
-                    buffer_idx++;
-                }
-
-                do {
-                    temp_buffer[temp_index] = (x % 10) + '0';
-                    temp_index--;
-                    x /= 10;
-                } while (x != 0);
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-
-            } else if (*string == 'x') {
-                /*
-                1. Convert the integer to a hex string.
-                2. Reverse the string.
-                3. Copy the string to the buffer. */
-                string++;
-                int x = va_arg(ap, int);
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                while (x != 0) {
-                    if ((x % 16) < 10) {
-                        temp_buffer[temp_index] = 48 + (x % 16);
-                    } else {
-                        temp_buffer[temp_index] = 55 + (x % 16);
-                    }
-                    temp_index--;
-                    x /= 16;
-                }
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-
-            }
-
-            else if (*string == 'o') {
-                /*
-                1. The first argument is the format string.
-                2. The remaining arguments are the values to be formatted.
-                3. The function returns the number of characters written to the
-                buffer, not including the null character. */
-                string++;
-
-                int x = va_arg(ap, int);
-
-                static char hex[] = "01234567";
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                do {
-                    temp_buffer[temp_index] = hex[x % 8];
-                    temp_index--;
-                    x /= 8;
-                } while (x != 0);
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-            }
-
-            else if (*string == 'c') {
-                // Print the character
-                string++;
-
-                int c = va_arg(ap, int);
-                buffer[buffer_idx] = c;
-                buffer_idx++;
-            }
-
-            else if (*string == 's') {
-                // Print the string
-                string++;
-                char* s = va_arg(ap, char*);
-                while (*s != '\0') {
-                    buffer[buffer_idx] = *s++;
-                    buffer_idx++;
-                }
-            }
-
-            else if (*string == 'f') {
-                /*
-                1. Convert the double to an integer.
-                2. Convert the integer to a string.
-                3. Copy the string to the buffer.
-                4. If the double has a decimal point, copy the decimal point to
-                the buffer.
-                5. Copy the buffer to the print buffer. */
-                string++;
-                double f = va_arg(ap, double);
-                int int_f = (double)f;
-                int dot_position = 0;
-                int number_precision = 10000;
-                for (; int_f != 0; dot_position++) {
-                    int_f /= 10;
-                }
-                int x = (int)(f * number_precision + 5);
-                x /= 10;
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                do {
-                    temp_buffer[temp_index] = (x % 10) + 48;
-                    temp_index--;
-                    x /= 10;
-                } while (x != 0);
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    if (i == (dot_position + temp_index + 1)) {
-                        buffer[buffer_idx] = '.';
-                        buffer_idx++;
-                    }
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-            }
-
-            else if (*string == '%') {
-                // Print percent sign
-                buffer[buffer_idx] = *(string++);
-                buffer_idx++;
-            }
-
-        } else if (*string >= 49 && *string <= 57) {
-            /*
-            1. Reads the format string and stores it in a buffer.
-            2. Reads the arguments and stores them in a buffer.
-            3. Prints the buffer. */
-            char before_type[50];
-            sub_string(string, before_type, 0, find_space_and_eof(string) - 1);
-
-            string++;
-
-            char width[100];
-            int i = 0;
-            int precision_flag = 0;
-
-            char* p = before_type;
-            while (*(p) != '.') {
-                if (*(p) == before_type[find_length(before_type) - 1]) {
-                    precision_flag = 0;
-                    break;
-                }
-                width[i++] = (*p);
-
-                p++;
-                precision_flag = 1;
-                string++;
-            }
-
-            char precision[100];
-            if (precision_flag == 1) {
-                int j = 0;
-
-                while (*(++p) != before_type[find_length(before_type) - 1]) {
-                    precision[j++] = *(p);
-
-                    string++;
-                }
-            }
-
-            if (before_type[find_length(before_type) - 1] == 's') {
-                char* x = va_arg(ap, char*);
-
-                int string_len = find_length(x);
-
-                int temp;
-
-                if (atoi(precision) > string_len) {
-                    temp = string_len;
-                } else {
-                    temp = atoi(precision);
-                }
-
-                for (int z = 0; z < atoi(width) - temp; z++) {
-                    buffer[buffer_idx] = ' ';
-                    buffer_idx++;
-                }
-
-                for (int i = 0; i < temp; i++) {
-                    buffer[buffer_idx] = *(x++);
-                    buffer_idx++;
-                }
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'c') {
-                for (int z = 0; z < atoi(width) - 1; z++) {
-                    buffer[buffer_idx] = ' ';
-                    buffer_idx++;
-                }
-
-                int x = va_arg(ap, int);
-
-                buffer[buffer_idx] = x;
-                buffer_idx++;
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'x') {
-                int x = va_arg(ap, int);
-
-                static char hex[] = "0123456789abcdef";
-                int temp_index = MAX_PRINT_SIZE - 1;
-                int buffer_temp_len = 0;
-
-                do {
-                    temp_buffer[temp_index] = hex[x % 16];
-                    temp_index--;
-                    x /= 16;
-                    buffer_temp_len++;
-                } while (x != 0);
-
-                for (int z = 0; z < atoi(width) - find_larger(atoi(precision),
-                                                              buffer_temp_len);
-                     z++) {
-                    buffer[buffer_idx] = ' ';
-                    buffer_idx++;
-                }
-
-                for (int j = 0; j < atoi(precision) - buffer_temp_len; j++) {
-                    buffer[buffer_idx] = '0';
-                    buffer_idx++;
-                }
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'f') {
-                float f = va_arg(ap, double);
-                int multiplier = 1;
-
-                int temp_len = -1;
-
-                if (atoi(precision) != 0) {
-                    for (int i = 0; i < atoi(precision); i++) {
-                        multiplier *= 10;
-                    }
-                } else {
-                    temp_len = 6;
-                }
-
-                long long convert_int = f * multiplier;
-
-                int flag_negative = 0;
-                if (convert_int < 0) {
-                    flag_negative = 1;
-                    convert_int *= (-1);
-                }
-
-                int temp_index = MAX_PRINT_SIZE - 1;
-                int count = 0;
-                int buffer_temp_len = 0;
-
-                do {
-                    if ((count == atoi(precision) && atoi(precision) != 0) ||
-                        count == temp_len) {
-                        temp_buffer[temp_index] = '.';
-                        temp_index--;
-                        count++;
-                        continue;
-                    }
-                    temp_buffer[temp_index] = (convert_int % 10) + '0';
-                    temp_index--;
-                    count++;
-                    convert_int /= 10;
-                    buffer_temp_len++;
-                } while (convert_int != 0);
-
-                for (int z = 0;
-                     z < atoi(width) - buffer_temp_len - 1 - flag_negative;
-                     z++) {
-                    buffer[buffer_idx] = ' ';
-                    buffer_idx++;
-                }
-
-                if (flag_negative == 1) {
-                    buffer[buffer_idx] = '-';
-                    buffer_idx++;
-                }
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'd') {
-                int x = va_arg(ap, int);
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                int buffer_temp_len = 0;
-                do {
-                    temp_buffer[temp_index] = (x % 10) + '0';
-                    temp_index--;
-                    buffer_temp_len++;
-                    x /= 10;
-                } while (x != 0);
-
-                for (int z = 0; z < atoi(width) - find_larger(atoi(precision),
-                                                              buffer_temp_len);
-                     z++) {
-                    buffer[buffer_idx] = ' ';
-                    buffer_idx++;
-                }
-
-                for (int j = 0; j < atoi(precision) - buffer_temp_len; j++) {
-                    buffer[buffer_idx] = '0';
-                    buffer_idx++;
-                }
-
-                int i;
-                for (i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-            }
-
-        } else if (*string == '.') {
-            /*
-            1. if the format is %d, then the next argument is an integer, and
-            the next argument is an integer.
-            2. if the format is %x, then the next argument is an integer, and
-            the next argument is an integer.
-            3. if the format is %f, then the next argument is a double, and the
-            next argument is a double.
-            4. if the format is %s, then the next argument is a string, and the
-            next argument is a string. */
-            char before_type[50];
-            sub_string(string, before_type, 0, find_space_and_eof(string) - 1);
-
-            string++;
-            char* p = before_type;
-
-            char precision[100];
-
-            int j = 0;
-
-            while (*(++p) != before_type[find_length(before_type) - 1]) {
-                precision[j++] = *(p);
-
-                string++;
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'd') {
-                int x = va_arg(ap, int);
-                int temp_index = MAX_PRINT_SIZE - 1;
-
-                int buffer_temp_len = 0;
-                do {
-                    temp_buffer[temp_index] = (x % 10) + '0';
-                    temp_index--;
-                    buffer_temp_len++;
-                    x /= 10;
-                } while (x != 0);
-
-                for (int j = 0; j < atoi(precision) - buffer_temp_len; j++) {
-                    buffer[buffer_idx] = '0';
-                    buffer_idx++;
-                }
-
-                int i;
-                for (i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-                string++;
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'x') {
-                int x = va_arg(ap, int);
-
-                static char hex[] = "0123456789abcdef";
-                int temp_index = MAX_PRINT_SIZE - 1;
-                int buffer_temp_len = 0;
-
-                do {
-                    temp_buffer[temp_index] = hex[x % 16];
-                    temp_index--;
-                    x /= 16;
-                    buffer_temp_len++;
-                } while (x != 0);
-
-                for (int j = 0; j < atoi(precision) - buffer_temp_len; j++) {
-                    buffer[buffer_idx] = '0';
-                    buffer_idx++;
-                }
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-                string++;
-            }
-
-            if (before_type[find_length(before_type) - 1] == 'f') {
-                double f = va_arg(ap, double);
-
-                int multiplier = 1;
-
-                int temp_len = -1;
-
-                if (atoi(precision) != 0) {
-                    for (int i = 0; i < atoi(precision); i++) {
-                        multiplier *= 10;
-                    }
-                } else {
-                    temp_len = 6;
-                }
-
-                unsigned long convert_int = f * multiplier;
-
-                int flag_negative = 0;
-                if (convert_int < 0) {
-                    flag_negative = 1;
-                    convert_int *= (-1);
-                }
-
-                int temp_index = MAX_PRINT_SIZE - 1;
-                int count = 0;
-                int buffer_temp_len = 0;
-
-                do {
-                    if ((count == atoi(precision) && atoi(precision) != 0) ||
-                        count == temp_len) {
-                        temp_buffer[temp_index] = '.';
-                        temp_index--;
-                        count++;
-                        continue;
-                    }
-                    temp_buffer[temp_index] = (convert_int % 10) + '0';
-                    temp_index--;
-                    count++;
-                    convert_int /= 10;
-                    buffer_temp_len++;
-                } while (convert_int != 0);
-
-                if (flag_negative == 1) {
-                    buffer[buffer_idx] = '-';
-                    buffer_idx++;
-                }
-
-                for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
-                    buffer[buffer_idx] = temp_buffer[i];
-                    buffer_idx++;
-                }
-                string++;
-            }
-
-            if (before_type[find_length(before_type) - 1] == 's') {
-                char* x = va_arg(ap, char*);
-
-                int string_len = find_length(x);
-
-                int temp;
-
-                if (atoi(precision) > string_len) {
-                    temp = string_len;
-                } else {
-                    temp = atoi(precision);
-                }
-
-                for (int i = 0; i < temp; i++) {
-                    buffer[buffer_idx] = *(x++);
-                    buffer_idx++;
-                }
-                string++;
-            }
-
-        } else {
-            buffer[buffer_idx] = *string;
-            buffer_idx++;
-            string++;
-        }
-
-        if (buffer_idx == MAX_PRINT_SIZE - 1) break;
-    }
-
-    va_end(ap);
-
-    uart_puts(buffer);
-}
-
-// function ulity
-// reference: stackoverflow
-void clearAll(char* s) {
-    while (*s != '\0') {
-        *(s++) = '\0';
+//======================================================================================//
+//               					SIDE FUNCTIONS		         						//
+//======================================================================================//
+// Function to reverse string
+//--------------------------------------------------------------------------------
+void reverse(char* str, int length)
+{
+    int start = 0;
+    int end = length - 1;
+	int temp;
+
+    while (start < end) {
+		temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+
+        start++;
+		end--;
     }
 }
+// user-defined pow function - EEET2601_2020C
+//--------------------------------------------------------------------------------
+double pow(double base, double power)  
+{  
+	// Initial value
+    double result = 1;
+	long int exp = power;
 
-unsigned long int power(unsigned int base, unsigned int pow) {
-    if (pow != 0) {
-        return (base * power(base, pow - 1));
-    } else
-        return 1;
+	// Check if exponent is negative
+	if (exp < 0) exp = exp *  (-1);
+	
+	while (exp){
+		if (exp % 2){
+			result *= base;
+			exp -= 1;
+		} 
+		else {
+			base *= base;
+			exp /= 2;
+		}
+	}
+
+	// Check if input power < 0
+	if (power < 0) result = (double)(1.0) / (double)result;
+
+	return result; 
+} 
+// Fucntion to count decimal places - https://java2blog.com/count-decimal-places-cpp/
+//--------------------------------------------------------------------------------
+int count_decimal_places(double decimal){
+	double num = decimal;
+	int dec_count = 0; // Count of Decimal places
+
+	// loop runs until num/(int)num is 1
+    while (num / (int)num != 1) { 
+        dec_count += 1; // Adds 1 to count
+        num *= 10; 	// num is multipled by 10
+    }
+
+	return dec_count;
 }
-void clear_buffer(char* str) {
-    char* p = str;
-    while (*p != '\0') {
-        *p = '\0';
-        p++;
+// Fucntion convert int to string - https://www.geeksforgeeks.org/implement-itoa/
+//--------------------------------------------------------------------------------
+int itoa(int x, char str[], int d){
+	int i = 0;
+
+	// Process individual digits
+	while (x){
+		str[i++] = (x % 10) + '0';
+		x = x / 10;
+	}
+
+	// If number of digits is required more, add 0s at the beginning
+	while (i < d)
+		str[i++] = '\0';
+
+	reverse(str,i);
+	str[i] = '\0';
+	return i;
+}
+
+// Function convert float to string - https://www.geeksforgeeks.org/convert-floating-point-number-string/
+//--------------------------------------------------------------------------------
+// Converts a floating-point/double number to a string.
+void ftoa(double n, char* res, int afterpoint)
+{
+    // Extract integer part
+    int ipart = (int)n;
+ 
+    // Extract floating part
+    double fpart = n - (double)ipart;
+ 
+    // convert integer part to string
+    int i = itoa(ipart, res, 0);
+
+	if (afterpoint == -1) afterpoint = count_decimal_places(n);
+ 
+    // check for display option after point
+    if (afterpoint != 0) {
+        res[i] = '.'; // add dot
+ 
+        // Get the value of fraction part upto given no.
+        // of points after dot. The third parameter
+        // is needed to handle cases like 233.007
+        fpart = fpart * pow(10, afterpoint);
+		fpart += 0.5;	// Round up
+ 
+        itoa((int)fpart, res + i + 1, afterpoint);
     }
 }
-int atoi(char s1[]) {
-    int coverted_int = 0, offset = 0, c;
+// Function to seperate the sub-specifier syntax 
+//--------------------------------------------------------------------------------
+void argument_check_sub_specfier(char* argument_string, int* width, int* precision, int* flag_zero, int* flag_zero_trig){
+	int flag_dot = 0;			// flag for character '.'
+	*flag_zero = 0;				// flag 0 sub specifier
+	*flag_zero_trig = 0;		// flag trigger the decimal read
 
-    for (c = offset; s1[c] != '\0'; c++) {
-        coverted_int = coverted_int * 10 + s1[c] - '0';
-    }
+	// Check zero flag
+	if (*argument_string == '0'){
+		*flag_zero = 1;
+	}
+	
+	// Check precision syntax
+	if (*argument_string == '.'){
+		flag_dot = 1;
+		argument_string++;
+		if (*argument_string == 'f'){
+			*flag_zero_trig = 1;	// enable the flag_zero_trig flag and read the int part
+		}
+		*precision = *argument_string - '0';
+	}
 
-    return coverted_int;
+	// Check first character of the argument pointer is 0
+	if(flag_dot == 0){
+		if (*flag_zero == 0){
+			*width = *argument_string - '0';	// Get the width from pointer
+		}
+		else{
+			argument_string++;
+			*width = *argument_string - '0';	// Get the width from pointer
+		}
+	}
+
+	argument_string++;
+
+	// Sweep through the argument specifier to check their width and precision
+	// while ((*description != 'd') && (*description != 'f') && (*description != 'x') && (*description != 'o')){
+	while ((*argument_string != 'd') && (*argument_string != 'f') && (*argument_string != 'x')){
+		if (*argument_string == '.'){
+			flag_dot = 1;
+			argument_string++;
+
+			// Get the precision value
+			*precision = *argument_string - '0';
+			argument_string++;
+			continue;
+		}
+
+		// Update the width and precision from the argument
+		if(flag_dot == 0){
+			*width = (*width * 10) + (*argument_string - '0');
+		}
+		else{
+			*precision = (*precision * 10) + (*argument_string - '0');
+		}
+		argument_string++;
+	}
 }
 
-int find_length(char* s1) {
-    int count = 0;
-    while (*s1 != '\0') {
-        count++;
-        s1++;
-    }
-    return count;
+
+//======================================================================================//
+//               					FUNCTION PRINTF		         						//
+//======================================================================================//
+// %d %c %s %f %x %%, 0 flag, width, and precision
+//--------------------------------------------------------------------------------
+void printf(char *string,...) {
+
+	va_list ap;
+	va_start(ap, string);
+
+	char cli_buffer[MAX_PRINT_SIZE];
+	int cli_buffer_index = 0;
+
+	int width = 0;
+	int precision = 0;
+	
+	int flag_0 = 0;
+	int flag_zero_trig = 0;
+	
+	char argument_string[MAX_PRINT_SIZE];
+	int digit_left = 0;
+
+	char temp_buffer[MAX_PRINT_SIZE];
+
+	while(1) {
+		if (*string == 0)
+			break;
+	
+	
+		if (*string == '%') {
+			string++;
+			//------------------------------------------------------------------------//
+			// 							  Sub - Specifier 						 	  //
+			//------------------------------------------------------------------------//
+			// Check width and precision
+			if ((*string > 47 && *string < 58) || *string == '.'){
+				int wp_index = 0;
+				while((*string != 'd') && (*string != 'f') && (*string != 'x')){
+					argument_string[wp_index] = *string;
+					string++;
+					wp_index++;
+				}
+
+				argument_string[wp_index] = *string;
+
+				// Sweep through all the specifier of the argument
+				if (argument_string[wp_index] == 'd' || argument_string[wp_index] == 'f' || argument_string[wp_index] == 'x'){
+					argument_check_sub_specfier(argument_string, &width, &precision, &flag_0, &flag_zero_trig);
+				}
+			}
+
+			//------------------------------------------------------------------------//
+			// 								Specifier 								  //
+			//------------------------------------------------------------------------//
+			// Specifier digit - %d
+			//---------------------------------------------------------------------------------
+			if (*string == 'd') {
+				string++;
+				int x = va_arg(ap, int);
+				int temp_index = MAX_PRINT_SIZE - 1;
+				int flag_negative = 0;
+
+				// Get the total length of the argument
+				// int argument_string_length = itoa(x, temp_buffer, precision-1);
+				
+				// Clear printf argument
+				reset_arr(argument_string);
+
+				// Convert negative num to positive num
+				// Get the flag for negative sign and update the width by 1
+				if(x < 0){
+					x *= (-1);
+					flag_negative = 1;
+					width = width + 1;
+					// width = width - 1;
+				}
+
+				// Store each digit into temp buffer
+				while(x != 0){
+					temp_buffer[temp_index] = (x % 10) + '0';
+					temp_index--;
+					x /= 10;
+				}
+
+				// Check width by digit
+				digit_left = width - (MAX_PRINT_SIZE - 1 - temp_index);
+
+				if (digit_left > 0){
+					for (int i = 0; i < digit_left; i++){
+						if (flag_0 == 1)
+						{
+							temp_buffer[temp_index] = '0';
+							temp_index--;
+						}
+						else
+						{
+							if (flag_negative == 1) {
+								temp_buffer[temp_index] = '-';
+								temp_index--;
+								flag_negative = 0;
+							}
+							temp_buffer[temp_index] = ' ';
+							temp_index--;
+						}
+					}
+				}
+				
+				// Add '-' if negative decimal 
+				// if (flag_negative == -1){
+				// 	argument_string_length++;
+				// 	cli_buffer[cli_buffer_index++] = '-';
+				// }
+				if (flag_negative == 1) {
+					temp_buffer[temp_index] = '-';
+					temp_index--;
+				}
+
+				for(int i = temp_index + 1; i < MAX_PRINT_SIZE; i++) {
+					cli_buffer[cli_buffer_index] = temp_buffer[i];
+					cli_buffer_index++;
+				}
+			}
+			// Specifier char - %c
+			//---------------------------------------------------------------------------------
+			else if (*string == 'c') {
+				string++;
+				char x = va_arg(ap, int);
+
+				cli_buffer[cli_buffer_index] = x;
+				cli_buffer_index++;
+			}
+
+			// Specifier string - %s
+			//---------------------------------------------------------------------------------
+			else if (*string == 's') {
+				string++;
+				char *x = va_arg(ap, char*);
+
+				// Export the data
+				while (*x) {
+					cli_buffer[cli_buffer_index++] = *(x++);
+				}
+
+				// Make sure string is ended
+				cli_buffer[cli_buffer_index] = '\0';
+			}
+			// Specifier float - %f
+			//---------------------------------------------------------------------------------
+			else if (*string == 'f') {
+				string++;
+				double x = va_arg(ap, double);
+				int temp_index = MAX_PRINT_SIZE - 1;
+				int flag_negative = 0;
+				int dec_count = 9;
+				// int cli_buffer_length = 0;
+
+				// // Get float num
+				// ftoa(x, temp_buffer, precision);
+				
+				// Clear printf argument
+				reset_arr(argument_string);
+
+				// Convert negative num to positive num
+				if(x < 0){
+					x *= (-1);
+					flag_negative = 1;
+					width = width - 1;
+				}
+
+				// Set default dec of float num
+				if (precision == 0) {
+					precision = 6;
+				} 
+
+				// Separate int and dec parts
+				int int_key = (int)x;
+				double dec_key = x - (double)int_key;
+				// Move all the dec_key to the left
+				int convert_dec_term = (dec_key * 1000000000);
+
+				// get decimal part
+				//-------------------------------------------------------------
+					while (dec_count != 0){
+						if (dec_count <= precision) {
+							temp_buffer[temp_index] = (convert_dec_term % 10) + '0';
+							temp_index--;
+						}
+
+						dec_count--; // default 6 decimals
+						convert_dec_term /= 10; // get the next dec num
+					}
+
+					// Print the dot after getting the decimal part
+					if(flag_zero_trig != 1){
+						temp_buffer[temp_index] = '.';
+						temp_index--;
+					}
+				
+				// get int num part
+				//-------------------------------------------------------------
+					while(int_key != 0){
+						temp_buffer[temp_index] = (int_key % 10) + '0';
+						temp_index--;
+						int_key /= 10; // get the next integer num
+					}
+
+				// Check width
+				digit_left = width - (MAX_PRINT_SIZE - 1 - temp_index);	
+
+				if (digit_left > 0){
+					for (int i = 0; i < digit_left; i++){
+						if (flag_0 == 1)
+						{
+							temp_buffer[temp_index] = '0';
+							temp_index--;
+						}
+						else
+						{
+							if (flag_negative == 1) {
+								temp_buffer[temp_index] = '-';
+								temp_index--;
+								flag_negative = 0;
+							}
+							temp_buffer[temp_index] = ' ';
+							temp_index--;
+						}
+					}
+				}
+
+				// Check negative num
+				if (flag_negative == 1) {
+					temp_buffer[temp_index] = '-';
+					temp_index--;
+				}
+
+				// Print the argument
+				for(int i = temp_index + 1, j = 0; i < MAX_PRINT_SIZE; i++, j++) {
+					cli_buffer[cli_buffer_index] = temp_buffer[i];
+					cli_buffer_index++;
+				}
+			}
+			// Specifier hex - %x
+			//---------------------------------------------------------------------------------
+			else if (*string == 'x') {
+				string++;
+				int x = va_arg(ap, int);
+				unsigned int num = x;
+				int i = 1;
+
+				// Clear the printf argument
+				reset_arr(argument_string);
+
+				while (num != 0) {
+					int digit = num % 16;
+
+					// get the hex value
+					digit += (digit > 9) ? (-10 + 'a') : '0';
+					temp_buffer[i++] = digit;
+
+					// Move to next digit
+					num /= 16;
+				}
+
+				// read the new converted hex 
+				for (int j = i - 1; j > 0; j--) {
+					cli_buffer[cli_buffer_index++] = temp_buffer[j];
+				}
+
+			}
+			// Specifier percentage - %% - https://www.quora.com/How-can-you-print-in-c-1
+  			//---------------------------------------------------------------------------------
+			else if (*string == '%'){
+				cli_buffer[cli_buffer_index] = *(string++);
+				cli_buffer_index++;
+			}
+		}
+		else {
+			cli_buffer[cli_buffer_index] = *string;
+			cli_buffer_index++;
+			string++;
+		}
+
+		if (cli_buffer_index == MAX_PRINT_SIZE - 1)
+			break;
+	}
+
+	va_end(ap);
+
+	//Print out formated string
+	uart_puts(cli_buffer);
+
+	//Clear buffer after printing
+	reset_arr(cli_buffer);
 }
 
-int find_larger(int s1, int s2) { return s1 > s2 ? s1 : s2; }
 
-void sub_string(char* s, char sub[], int first_index, int last_index) {
-    int i = 0;
 
-    while (first_index <= last_index) {
-        sub[i] = s[first_index];
-        first_index++;
-        i++;
-    }
-    sub[i] = '\0';
-}
 
-int find_dash(char* string, char delimeter[]) {
-    int count = 0;
 
-    while (*string != '\0') {
-        if (*string == delimeter[0]) {
-            if (*(++string) == delimeter[1]) {
-                count++;
-                return count;
-            }
-            count++;
-            continue;
-        }
 
-        string++;
-        count++;
-    }
-    return -1;
-}
-
-int find_space(char* string) {
-    int count = 0;
-
-    while (*string != '\0') {
-        if (*string == SPACE) {
-            return count;
-        }
-
-        string++;
-        count++;
-    }
-    return -1;
-}
-
-int find_space_and_eof(char* string) {
-    int count = 0;
-
-    while (*string != '\0') {
-        if (*string == SPACE) {
-            return count;
-        }
-
-        string++;
-        count++;
-    }
-    return count;
-}
